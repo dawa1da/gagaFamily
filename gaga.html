@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAGA卧底</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .button-container {
+            margin-top: 30px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:active {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+<h1>GAGA卧底</h1>
+<div class="button-container">
+    <button onclick="urlRequest('/gagaFamily/group/getGroup')">分组</button>
+    <button onclick="urlRequest('/gagaFamily/undercoverGame/resetUndercover')">重置</button>
+    <button onclick="urlRequest('/gagaFamily/undercoverGame/getUndercover')">抽取</button>
+</div>
+
+<script>
+    function urlRequest(url) {
+        const apiUrl = 'http://118.89.80.107:8008' + url; // 示例 API 地址
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应失败，状态码：' + response.status);
+                }
+                return response.text();
+            })
+            .then(data => {
+                alert(data);
+            })
+    }
+</script>
+</body>
+</html>
