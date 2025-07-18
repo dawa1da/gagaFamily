@@ -3,82 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>王者荣耀英雄随机选择</title>
+    <title>王者荣耀5v5比赛系统</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1 class="title">王者荣耀英雄随机选择</h1>
-            <p class="subtitle">5v5 对战英雄分配系统</p>
+            <h1 class="title">王者荣耀5v5比赛系统</h1>
+            <p class="subtitle">智能分路分配 · 英雄选择 · 团队平衡</p>
+            <div class="admin-link">
+                <a href="admin.html">管理端</a>
+            </div>
         </header>
 
         <main class="main">
-            <!-- 随机分路选择区域 -->
-            <section class="lane-selection">
-                <h2>随机选择分路</h2>
-                <div class="random-lane-section">
-                    <button class="btn btn-primary random-lane-btn" id="randomLaneBtn">
-                        <span class="btn-icon">🎲</span>
-                        随机生成分路
-                    </button>
-                    <div class="selected-lane-display" id="selectedLaneDisplay" style="display: none;">
-                        <h3>已选择分路：<span id="currentLaneName"></span></h3>
-                        <button class="btn btn-secondary" id="changeLaneBtn">重新选择</button>
+            <!-- 玩家管理区域 -->
+            <section class="section player-management">
+                <h2>玩家管理</h2>
+                <div class="player-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>玩家姓名</label>
+                            <input type="text" id="playerName" placeholder="输入玩家姓名" maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label>性别</label>
+                            <select id="playerGender">
+                                <option value="">选择性别</option>
+                                <option value="male">男</option>
+                                <option value="female">女</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" id="addPlayerBtn">添加玩家</button>
                     </div>
                 </div>
                 
-                <div class="lane-grid" id="laneGrid" style="display: none;">
-                    <h3>手动选择分路</h3>
-                    <div class="lane-cards">
-                        <div class="lane-card" data-lane="上路">
-                            <div class="lane-icon">⚔️</div>
-                            <h3>上路</h3>
-                            <p>战士/坦克</p>
-                        </div>
-                        <div class="lane-card" data-lane="中路">
-                            <div class="lane-icon">🔮</div>
-                            <h3>中路</h3>
-                            <p>法师/刺客</p>
-                        </div>
-                        <div class="lane-card" data-lane="下路">
-                            <div class="lane-icon">🏹</div>
-                            <h3>下路</h3>
-                            <p>射手</p>
-                        </div>
-                        <div class="lane-card" data-lane="打野">
-                            <div class="lane-icon">🗡️</div>
-                            <h3>打野</h3>
-                            <p>刺客/战士</p>
-                        </div>
-                        <div class="lane-card" data-lane="辅助">
-                            <div class="lane-icon">🛡️</div>
-                            <h3>辅助</h3>
-                            <p>辅助/坦克</p>
-                        </div>
+                <div class="player-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">总人数</span>
+                        <span class="stat-value" id="totalPlayers">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">男生</span>
+                        <span class="stat-value" id="maleCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">女生</span>
+                        <span class="stat-value" id="femaleCount">0</span>
                     </div>
                 </div>
-            </section>
-
-            <!-- 英雄展示区域 -->
-            <section class="hero-display" id="heroDisplay" style="display: none;">
-                <h2 id="selectedLaneTitle">已选择分路</h2>
-                <div class="hero-grid" id="heroGrid">
-                    <!-- 英雄卡片将在这里动态生成 -->
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-secondary" id="backBtn">返回选择分路</button>
+                
+                <div class="player-list" id="playerList">
+                    <!-- 玩家列表将在这里动态生成 -->
                 </div>
             </section>
 
-            <!-- 已选择英雄展示 -->
-            <section class="selected-heroes">
-                <h2>本场已选择英雄</h2>
-                <div class="selected-heroes-grid" id="selectedHeroesGrid">
-                    <!-- 已选择的英雄将在这里显示 -->
+            <!-- 团队分配区域 -->
+            <section class="section team-assignment">
+                <h2>团队分配</h2>
+                <div class="form-actions">
+                    <button class="btn btn-primary" id="assignTeamsBtn">分配团队</button>
                 </div>
-                <div class="reset-section">
-                    <button class="btn btn-danger" id="resetBtn">重置所有选择</button>
+                
+                <div class="team-grid" id="teamGrid" style="display: none;">
+                    <!-- 团队信息将在这里动态生成 -->
+                </div>
+            </section>
+
+            <!-- 分路分配区域 -->
+            <section class="section lane-assignment">
+                <h2>分路分配</h2>
+                <div class="form-actions">
+                    <button class="btn btn-primary" id="assignLanesBtn">分配分路</button>
+                </div>
+                
+                <div class="lane-grid" id="laneGrid" style="display: none;">
+                    <!-- 分路信息将在这里动态生成 -->
+                </div>
+            </section>
+
+            <!-- 英雄选择区域 -->
+            <section class="section hero-selection">
+                <h2>英雄选择</h2>
+                <div class="form-actions">
+                    <button class="btn btn-primary" id="selectHeroesBtn">开始选择英雄</button>
+                </div>
+                
+                <div class="hero-grid" id="heroGrid" style="display: none;">
+                    <!-- 英雄选择网格将在这里动态生成 -->
+                </div>
+            </section>
+
+            <!-- 结果展示区域 -->
+            <section class="section results">
+                <h2>比赛结果</h2>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" id="resetBtn">重新开始</button>
+                </div>
+                
+                <div class="results-grid" id="resultsGrid" style="display: none;">
+                    <!-- 比赛结果将在这里动态生成 -->
                 </div>
             </section>
         </main>
@@ -86,12 +112,17 @@
         <!-- 加载提示 -->
         <div class="loading" id="loading" style="display: none;">
             <div class="spinner"></div>
-            <p>正在加载英雄数据...</p>
+            <p>正在处理...</p>
         </div>
 
         <!-- 错误提示 -->
         <div class="error" id="error" style="display: none;">
             <p id="errorMessage"></p>
+        </div>
+
+        <!-- 成功提示 -->
+        <div class="success" id="success" style="display: none;">
+            <p id="successMessage"></p>
         </div>
     </div>
 

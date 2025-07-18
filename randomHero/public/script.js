@@ -1,442 +1,497 @@
 // 全局变量
-let currentLane = null;
-let selectedHeroes = [];
+let players = [];
+let teams = [];
+let laneAssignments = {};
+let selectedHeroes = {};
+let heroConfig = {};
 
-// DOM 元素
-const randomLaneBtn = document.getElementById('randomLaneBtn');
-const selectedLaneDisplay = document.getElementById('selectedLaneDisplay');
-const currentLaneName = document.getElementById('currentLaneName');
-const changeLaneBtn = document.getElementById('changeLaneBtn');
+// DOM元素
+const playerNameInput = document.getElementById('playerName');
+const playerGenderSelect = document.getElementById('playerGender');
+const addPlayerBtn = document.getElementById('addPlayerBtn');
+const playerList = document.getElementById('playerList');
+const totalPlayersSpan = document.getElementById('totalPlayers');
+const maleCountSpan = document.getElementById('maleCount');
+const femaleCountSpan = document.getElementById('femaleCount');
+
+const assignTeamsBtn = document.getElementById('assignTeamsBtn');
+const teamGrid = document.getElementById('teamGrid');
+
+const assignLanesBtn = document.getElementById('assignLanesBtn');
 const laneGrid = document.getElementById('laneGrid');
-const laneCards = document.querySelectorAll('.lane-card');
-const heroDisplay = document.getElementById('heroDisplay');
+
+const selectHeroesBtn = document.getElementById('selectHeroesBtn');
 const heroGrid = document.getElementById('heroGrid');
-const selectedLaneTitle = document.getElementById('selectedLaneTitle');
-const backBtn = document.getElementById('backBtn');
+
 const resetBtn = document.getElementById('resetBtn');
-const selectedHeroesGrid = document.getElementById('selectedHeroesGrid');
+const resultsGrid = document.getElementById('resultsGrid');
+
 const loading = document.getElementById('loading');
 const error = document.getElementById('error');
+const success = document.getElementById('success');
 const errorMessage = document.getElementById('errorMessage');
+const successMessage = document.getElementById('successMessage');
 
 const host = 'http://localhost:3000';
 
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
+    loadHeroConfig();
+    updatePlayerStats();
+    setupEventListeners();
 });
 
-// 初始化应用
-async function initializeApp() {
-    showLoading();
+// 设置事件监听器
+function setupEventListeners() {
+    addPlayerBtn.addEventListener('click', addPlayer);
+    assignTeamsBtn.addEventListener('click', assignTeams);
+    assignLanesBtn.addEventListener('click', assignLanes);
+    selectHeroesBtn.addEventListener('click', startHeroSelection);
+    resetBtn.addEventListener('click', resetAll);
     
-    try {
-        // 等待服务器启动并加载英雄数据
-        await waitForServer();
-        
-        // 加载已选择的英雄
-        await loadSelectedHeroes();
-        
-        // 绑定事件监听器
-        bindEventListeners();
-        
-        hideLoading();
-    } catch (err) {
-        showError('初始化失败: ' + err.message);
-        hideLoading();
-    }
-}
-
-// 等待服务器启动
-async function waitForServer() {
-    const maxAttempts = 30;
-    let attempts = 0;
-    
-    while (attempts < maxAttempts) {
-        try {
-            const response = await fetch(`${host}/api/lanes`);
-            if (response.ok) {
-                return;
-            }
-        } catch (err) {
-            // 继续尝试
+    // 回车键添加玩家
+    playerNameInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            addPlayer();
         }
-        
-        attempts++;
-        await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-    
-    throw new Error('服务器启动超时');
-}
-
-// 绑定事件监听器
-function bindEventListeners() {
-    // 随机分路选择
-    randomLaneBtn.addEventListener('click', randomSelectLane);
-    
-    // 重新选择分路
-    changeLaneBtn.addEventListener('click', showLaneSelection);
-    
-    // 手动分路选择
-    laneCards.forEach(card => {
-        card.addEventListener('click', () => selectLane(card.dataset.lane));
     });
-    
-    // 返回按钮
-    backBtn.addEventListener('click', goBackToLaneSelection);
-    
-    // 重置按钮
-    resetBtn.addEventListener('click', resetAllSelections);
 }
 
-// 随机选择分路
-async function randomSelectLane() {
+// 加载英雄配置
+async function loadHeroConfig() {
     try {
         showLoading();
-        
-        const response = await fetch(`${host}/api/random-lane`);
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || '随机选择分路失败');
-        }
-        
-        const randomLane = data.lane;
-        
-        currentLane = randomLane;
-        currentLaneName.textContent = randomLane;
-        
-        // 显示已选择分路
-        randomLaneBtn.style.display = 'none';
-        selectedLaneDisplay.style.display = 'block';
-        
-        // 直接随机生成该分路的3个英雄供选择
-        const heroResponse = await fetch(`${host}/api/random/${randomLane}`);
-        const heroData = await heroResponse.json();
-        
-        if (!heroResponse.ok) {
-            throw new Error(heroData.error || '随机生成英雄失败');
-        }
-        
-        // 显示英雄选择界面
-        showHeroSelection(heroData.heroes, heroData.remainingCount);
-        
-        // 隐藏手动选择分路
-        laneGrid.style.display = 'none';
-        
-        hideLoading();
-    } catch (err) {
-        showError('随机选择分路失败: ' + err.message);
-        hideLoading();
-    }
-}
-
-// 显示分路选择
-function showLaneSelection() {
-    randomLaneBtn.style.display = 'inline-block';
-    selectedLaneDisplay.style.display = 'none';
-    laneGrid.style.display = 'block';
-    heroDisplay.style.display = 'none';
-    currentLane = null;
-}
-
-// 选择分路
-async function selectLane(lane) {
-    try {
-        showLoading();
-        
-        // 更新UI状态
-        laneCards.forEach(card => card.classList.remove('selected'));
-        const selectedCard = document.querySelector(`[data-lane="${lane}"]`);
-        if (selectedCard) {
-            selectedCard.classList.add('selected');
-        }
-        
-        currentLane = lane;
-        
-        // 直接随机生成3个英雄供选择
-        const response = await fetch(`${host}/api/random/${lane}`);
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || '随机生成英雄失败');
-        }
-        
-        // 显示英雄选择界面
-        showHeroSelection(data.heroes, data.remainingCount);
-        
-        // 隐藏手动选择分路
-        laneGrid.style.display = 'none';
-        
-        hideLoading();
-    } catch (err) {
-        showError('选择分路失败: ' + err.message);
-        hideLoading();
-    }
-}
-
-// 显示英雄选择界面
-function showHeroSelection(heroes, remainingCount) {
-    // 清空英雄网格
-    heroGrid.innerHTML = '';
-    
-    // 显示可选择的英雄
-    heroes.forEach(hero => {
-        const heroCard = createSelectableHeroCard(hero);
-        heroGrid.appendChild(heroCard);
-    });
-    
-    // 更新标题
-    selectedLaneTitle.textContent = `${currentLane} - 请选择一个英雄 (剩余${remainingCount}个可用英雄)`;
-    
-    // 显示英雄展示区域，隐藏分路选择
-    document.querySelector('.lane-selection').style.display = 'none';
-    heroDisplay.style.display = 'block';
-}
-
-// 创建可选择英雄卡片
-function createSelectableHeroCard(hero) {
-    const card = document.createElement('div');
-    card.className = 'hero-card selectable';
-    card.dataset.heroId = hero.id;
-    card.innerHTML = `
-        <div class="hero-avatar">${hero.name.charAt(0)}</div>
-        <div class="hero-name">${hero.name}</div>
-        <div class="hero-title">${hero.title}</div>
-        <div class="hero-type">${hero.type}</div>
-        <div class="select-overlay">
-            <button class="select-btn">选择此英雄</button>
-        </div>
-    `;
-    
-    // 添加点击事件
-    card.addEventListener('click', () => selectHero(hero.id, hero));
-    
-    return card;
-}
-
-// 选择英雄
-async function selectHero(heroId, hero) {
-    try {
-        showLoading();
-        
-        const response = await fetch(`${host}/api/select-hero/${heroId}`, {
-            method: 'POST'
-        });
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error || '选择英雄失败');
-        }
-        
-        // 显示选择成功的英雄
-        showSelectedHero([hero]);
-        
-        // 更新已选择英雄列表
-        await loadSelectedHeroes();
-        
-        showSuccess(`已选择英雄: ${hero.name}`);
-        
-        hideLoading();
-    } catch (err) {
-        showError('选择英雄失败: ' + err.message);
-        hideLoading();
-    }
-}
-
-// 显示选中的英雄
-function showSelectedHero(heroes) {
-    // 清空英雄网格
-    heroGrid.innerHTML = '';
-    
-    // 显示选中的英雄
-    heroes.forEach(hero => {
-        const heroCard = createSelectedHeroCard(hero);
-        heroGrid.appendChild(heroCard);
-    });
-    
-    // 更新标题
-    selectedLaneTitle.textContent = `${currentLane} - 已选择英雄`;
-    
-    // 禁用随机选择按钮
-}
-
-// 创建已选择英雄卡片
-function createSelectedHeroCard(hero) {
-    const card = document.createElement('div');
-    card.className = 'hero-card selected';
-    card.innerHTML = `
-        <div class="hero-avatar">${hero.name.charAt(0)}</div>
-        <div class="hero-name">${hero.name}</div>
-        <div class="hero-title">${hero.title}</div>
-        <div class="hero-type">${hero.type}</div>
-    `;
-    return card;
-}
-
-// 返回分路选择
-function goBackToLaneSelection() {
-    // 清除选中状态
-    laneCards.forEach(card => card.classList.remove('selected'));
-    
-    // 显示分路选择，隐藏英雄展示
-    document.querySelector('.lane-selection').style.display = 'block';
-    heroDisplay.style.display = 'none';
-    
-    currentLane = null;
-    selectedHeroes = [];
-}
-
-// 加载已选择的英雄
-async function loadSelectedHeroes() {
-    try {
-        const response = await fetch(`${host}/api/selected`);
-        const data = await response.json();
-        
+        const response = await fetch(`${host}/api/admin/hero-config`);
         if (response.ok) {
-            selectedHeroes = data.selectedHeroes;
-            updateSelectedHeroesDisplay();
+            heroConfig = await response.json();
+        } else {
+            // 如果配置不存在，使用默认配置
+            heroConfig = getDefaultHeroConfig();
         }
     } catch (err) {
-        console.error('加载已选择英雄失败:', err);
+        console.error('加载英雄配置失败:', err);
+        heroConfig = getDefaultHeroConfig();
+    } finally {
+        hideLoading();
     }
 }
 
-// 更新已选择英雄显示
-function updateSelectedHeroesDisplay() {
-    selectedHeroesGrid.innerHTML = '';
+// 获取默认英雄配置
+function getDefaultHeroConfig() {
+    return {
+        top: ['亚瑟', '吕布', '关羽', '张飞', '典韦', '程咬金', '钟馗', '李信', '花木兰', '铠'],
+        jungle: ['李白', '韩信', '赵云', '兰陵王', '娜可露露', '阿轲', '百里玄策', '云中君', '镜', '澜'],
+        mid: ['妲己', '安琪拉', '王昭君', '貂蝉', '小乔', '甄姬', '杨玉环', '上官婉儿', '西施', '嫦娥'],
+        bot: ['后羿', '鲁班七号', '孙尚香', '虞姬', '黄忠', '马可波罗', '公孙离', '伽罗', '蒙犽', '艾琳'],
+        support: ['蔡文姬', '大乔', '小乔', '孙膑', '庄周', '张飞', '牛魔', '鬼谷子', '太乙真人', '鲁班大师']
+    };
+}
+
+// 添加玩家
+async function addPlayer() {
+    const name = playerNameInput.value.trim();
+    const gender = playerGenderSelect.value;
     
-    if (selectedHeroes.length === 0) {
-        selectedHeroesGrid.innerHTML = `
-            <div class="empty-state">
-                <p>还没有选择任何英雄</p>
-            </div>
-        `;
-    } else {
-        // 添加统计信息
-        const statsDiv = document.createElement('div');
-        statsDiv.className = 'stats-info';
-        statsDiv.innerHTML = `
-            <div class="stats-item">
-                <span class="stats-label">已选择英雄:</span>
-                <span class="stats-value">${selectedHeroes.length}</span>
-            </div>
-            <div class="stats-item">
-                <span class="stats-label">剩余可用:</span>
-                <span class="stats-value">${getTotalAvailableCount()}</span>
-            </div>
-        `;
-        selectedHeroesGrid.appendChild(statsDiv);
-        
-        // 显示已选择的英雄
-        selectedHeroes.forEach(hero => {
-            const heroCard = createSelectedHeroCardSmall(hero);
-            selectedHeroesGrid.appendChild(heroCard);
-        });
+    if (!name) {
+        showError('请输入玩家姓名');
+        return;
     }
-}
-
-// 获取总可用英雄数量
-function getTotalAvailableCount() {
-    // 这里可以根据需要计算总可用数量
-    // 暂时返回一个估算值
-    return Math.max(0, 100 - selectedHeroes.length); // 假设总共有100个英雄
-}
-
-// 创建小型已选择英雄卡片
-function createSelectedHeroCardSmall(hero) {
-    const card = document.createElement('div');
-    card.className = 'selected-hero-card';
-    card.innerHTML = `
-        <div class="selected-hero-avatar">${hero.name.charAt(0)}</div>
-        <div class="selected-hero-name">${hero.name}</div>
-        <div class="selected-hero-type">${hero.type}</div>
-    `;
-    return card;
-}
-
-// 重置所有选择
-async function resetAllSelections() {
-    if (!confirm('确定要重置所有已选择的英雄吗？')) {
+    
+    if (!gender) {
+        showError('请选择性别');
+        return;
+    }
+    
+    if (players.length >= 10) {
+        showError('最多只能添加10名玩家');
+        return;
+    }
+    
+    if (players.some(p => p.name === name)) {
+        showError('玩家姓名已存在');
         return;
     }
     
     try {
         showLoading();
-        
-        const response = await fetch(`${host}/api/reset`, { method: 'POST' });
-        const data = await response.json();
+        const response = await fetch(`${host}/api/players`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name, gender })
+        });
         
         if (response.ok) {
-            selectedHeroes = [];
-            updateSelectedHeroesDisplay();
-            
-            // 重置UI状态
-            randomLaneBtn.style.display = 'inline-block';
-            selectedLaneDisplay.style.display = 'none';
-            laneGrid.style.display = 'none';
-            heroDisplay.style.display = 'none';
-            document.querySelector('.lane-selection').style.display = 'block';
-            
-            currentLane = null;
-            
-            showSuccess('已重置所有选择');
+            const player = await response.json();
+            players.push(player);
+            updatePlayerList();
+            updatePlayerStats();
+            clearPlayerForm();
+            showSuccess('玩家添加成功');
         } else {
-            throw new Error(data.error || '重置失败');
+            const error = await response.json();
+            showError(error.message || '添加玩家失败');
         }
-        
-        hideLoading();
     } catch (err) {
-        showError('重置失败: ' + err.message);
+        console.error('添加玩家失败:', err);
+        showError('网络错误，请重试');
+    } finally {
         hideLoading();
     }
 }
 
-// 显示加载状态
+// 删除玩家
+async function deletePlayer(playerId) {
+    try {
+        showLoading();
+        const response = await fetch(`${host}/api/players/${playerId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            players = players.filter(p => p.id !== playerId);
+            updatePlayerList();
+            updatePlayerStats();
+            showSuccess('玩家删除成功');
+        } else {
+            const error = await response.json();
+            showError(error.message || '删除玩家失败');
+        }
+    } catch (err) {
+        console.error('删除玩家失败:', err);
+        showError('网络错误，请重试');
+    } finally {
+        hideLoading();
+    }
+}
+
+// 更新玩家列表
+function updatePlayerList() {
+    playerList.innerHTML = '';
+    
+    players.forEach(player => {
+        const playerCard = document.createElement('div');
+        playerCard.className = 'player-card';
+        playerCard.innerHTML = `
+            <div class="player-header">
+                <div class="player-info">
+                    <div class="player-name">${player.name}</div>
+                    <div class="player-gender ${player.gender}">${player.gender === 'male' ? '男' : '女'}</div>
+                </div>
+            </div>
+            ${player.lane ? `<div class="player-lane">${getLaneDisplayName(player.lane)}</div>` : ''}
+            <div class="player-actions">
+                <button class="btn btn-danger" onclick="deletePlayer('${player.id}')">删除</button>
+            </div>
+        `;
+        playerList.appendChild(playerCard);
+    });
+}
+
+// 更新玩家统计
+function updatePlayerStats() {
+    totalPlayersSpan.textContent = players.length;
+    maleCountSpan.textContent = players.filter(p => p.gender === 'male').length;
+    femaleCountSpan.textContent = players.filter(p => p.gender === 'female').length;
+}
+
+// 清空玩家表单
+function clearPlayerForm() {
+    playerNameInput.value = '';
+    playerGenderSelect.value = '';
+    playerNameInput.focus();
+}
+
+// 分配团队
+async function assignTeams() {
+    if (players.length !== 10) {
+        showError('需要10名玩家才能分配团队');
+        return;
+    }
+    
+    try {
+        showLoading();
+        const response = await fetch(`${host}/api/teams/assign`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            teams = await response.json();
+            displayTeams();
+            showSuccess('团队分配成功');
+        } else {
+            const error = await response.json();
+            showError(error.message || '团队分配失败');
+        }
+    } catch (err) {
+        console.error('团队分配失败:', err);
+        showError('网络错误，请重试');
+    } finally {
+        hideLoading();
+    }
+}
+
+// 显示团队
+function displayTeams() {
+    teamGrid.style.display = 'grid';
+    teamGrid.innerHTML = '';
+    
+    teams.forEach((team, index) => {
+        const teamCard = document.createElement('div');
+        teamCard.className = 'team-card';
+        
+        const maleCount = team.players.filter(p => p.gender === 'male').length;
+        const femaleCount = team.players.filter(p => p.gender === 'female').length;
+        
+        teamCard.innerHTML = `
+            <div class="team-header">
+                <div class="team-name">${index === 0 ? '蓝队' : '红队'} (${team.players.length}人)</div>
+                <div class="team-stats">
+                    <span>男: ${maleCount}</span>
+                    <span>女: ${femaleCount}</span>
+                </div>
+            </div>
+            <div class="team-members">
+                ${team.players.map(player => `
+                    <div class="team-member">
+                        <div class="member-info">
+                            <div class="member-name">${player.name}</div>
+                            <div class="member-gender">${player.gender === 'male' ? '男' : '女'}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        teamGrid.appendChild(teamCard);
+    });
+}
+
+// 分配分路
+async function assignLanes() {
+    if (players.length !== 10) {
+        showError('需要10名玩家才能分配分路');
+        return;
+    }
+    
+    try {
+        showLoading();
+        const response = await fetch(`${host}/api/lanes/assign`);
+        
+        if (response.ok) {
+            laneAssignments = await response.json();
+            displayLanes();
+            showSuccess('分路分配成功');
+        } else {
+            const error = await response.json();
+            showError(error.message || '分路分配失败');
+        }
+    } catch (err) {
+        console.error('分路分配失败:', err);
+        showError('网络错误，请重试');
+    } finally {
+        hideLoading();
+    }
+}
+
+// 显示分路
+function displayLanes() {
+    laneGrid.style.display = 'grid';
+    laneGrid.innerHTML = '';
+    
+    const lanes = ['top', 'jungle', 'mid', 'bot', 'support'];
+    const laneNames = ['上路', '打野', '中路', '下路', '辅助'];
+    
+    lanes.forEach((lane, index) => {
+        const player = players.find(p => laneAssignments[p.id] === lane);
+        if (player) {
+            const laneCard = document.createElement('div');
+            laneCard.className = 'player-card';
+            laneCard.innerHTML = `
+                <div class="player-header">
+                    <div class="player-info">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-gender ${player.gender}">${player.gender === 'male' ? '男' : '女'}</div>
+                    </div>
+                </div>
+                <div class="player-lane">${laneNames[index]}</div>
+            `;
+            laneGrid.appendChild(laneCard);
+        }
+    });
+}
+
+// 开始英雄选择
+function startHeroSelection() {
+    if (Object.keys(laneAssignments).length === 0) {
+        showError('请先分配分路');
+        return;
+    }
+    
+    displayHeroSelection();
+}
+
+// 显示英雄选择
+function displayHeroSelection() {
+    heroGrid.style.display = 'grid';
+    heroGrid.innerHTML = '';
+    
+    players.forEach(player => {
+        const lane = laneAssignments[player.id];
+        const laneHeroes = heroConfig[lane] || [];
+        
+        const playerSection = document.createElement('div');
+        playerSection.className = 'player-card';
+        playerSection.innerHTML = `
+            <div class="player-header">
+                <div class="player-info">
+                    <div class="player-name">${player.name}</div>
+                    <div class="player-lane">${getLaneDisplayName(lane)}</div>
+                </div>
+            </div>
+            <div class="hero-grid" style="grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));">
+                ${laneHeroes.map(hero => `
+                    <div class="hero-card" onclick="selectHero('${player.id}', '${hero}')">
+                        <div class="hero-avatar">${hero.charAt(0)}</div>
+                        <div class="hero-name">${hero}</div>
+                        <div class="hero-type">${getLaneDisplayName(lane)}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        heroGrid.appendChild(playerSection);
+    });
+}
+
+// 选择英雄
+async function selectHero(playerId, heroName) {
+    try {
+        showLoading();
+        const response = await fetch(`${host}/api/heroes/select`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ playerId, heroName })
+        });
+        
+        if (response.ok) {
+            selectedHeroes[playerId] = heroName;
+            displayResults();
+            showSuccess('英雄选择成功');
+        } else {
+            const error = await response.json();
+            showError(error.message || '英雄选择失败');
+        }
+    } catch (err) {
+        console.error('英雄选择失败:', err);
+        showError('网络错误，请重试');
+    } finally {
+        hideLoading();
+    }
+}
+
+// 显示结果
+function displayResults() {
+    resultsGrid.style.display = 'grid';
+    resultsGrid.innerHTML = '';
+    
+    players.forEach(player => {
+        const lane = laneAssignments[player.id];
+        const hero = selectedHeroes[player.id];
+        
+        if (lane && hero) {
+            const resultCard = document.createElement('div');
+            resultCard.className = 'result-card';
+            resultCard.innerHTML = `
+                <div class="result-header">
+                    <div class="result-player">${player.name}</div>
+                    <div class="result-lane">${getLaneDisplayName(lane)}</div>
+                </div>
+                <div class="result-hero">
+                    <div class="result-hero-avatar">${hero.charAt(0)}</div>
+                    <div class="result-hero-info">
+                        <div class="result-hero-name">${hero}</div>
+                        <div class="result-hero-type">${getLaneDisplayName(lane)}</div>
+                    </div>
+                </div>
+            `;
+            resultsGrid.appendChild(resultCard);
+        }
+    });
+}
+
+// 重新开始
+async function resetAll() {
+    try {
+        showLoading();
+        const response = await fetch(`${host}/api/reset`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            players = [];
+            teams = [];
+            laneAssignments = {};
+            selectedHeroes = {};
+            
+            updatePlayerList();
+            updatePlayerStats();
+            
+            teamGrid.style.display = 'none';
+            laneGrid.style.display = 'none';
+            heroGrid.style.display = 'none';
+            resultsGrid.style.display = 'none';
+            
+            showSuccess('已重置所有数据');
+        } else {
+            const error = await response.json();
+            showError(error.message || '重置失败');
+        }
+    } catch (err) {
+        console.error('重置失败:', err);
+        showError('网络错误，请重试');
+    } finally {
+        hideLoading();
+    }
+}
+
+// 获取分路显示名称
+function getLaneDisplayName(lane) {
+    const laneNames = {
+        'top': '上路',
+        'jungle': '打野',
+        'mid': '中路',
+        'bot': '下路',
+        'support': '辅助'
+    };
+    return laneNames[lane] || lane;
+}
+
+// 显示加载
 function showLoading() {
     loading.style.display = 'flex';
 }
 
-// 隐藏加载状态
+// 隐藏加载
 function hideLoading() {
     loading.style.display = 'none';
 }
 
-// 显示错误信息
+// 显示错误
 function showError(message) {
     errorMessage.textContent = message;
     error.style.display = 'block';
-    
     setTimeout(() => {
         error.style.display = 'none';
-    }, 5000);
-}
-
-// 显示成功信息
-function showSuccess(message) {
-    // 创建成功提示
-    const success = document.createElement('div');
-    success.className = 'error';
-    success.style.background = 'rgba(78, 205, 196, 0.9)';
-    success.innerHTML = `<p>${message}</p>`;
-    
-    document.body.appendChild(success);
-    
-    setTimeout(() => {
-        success.remove();
     }, 3000);
 }
 
-// 添加键盘快捷键
-document.addEventListener('keydown', function(event) {
-    // ESC键返回
-    if (event.key === 'Escape' && currentLane) {
-        goBackToLaneSelection();
-    }
-    
-    // 空格键随机选择分路
-    if (event.key === ' ' && !currentLane) {
-        event.preventDefault();
-        randomSelectLane();
-    }
-}); 
+// 显示成功
+function showSuccess(message) {
+    successMessage.textContent = message;
+    success.style.display = 'block';
+    setTimeout(() => {
+        success.style.display = 'none';
+    }, 3000);
+} 

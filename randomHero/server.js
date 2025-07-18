@@ -1,264 +1,374 @@
-import express, { json } from 'express';
-import fetch from 'node-fetch';
-import cors from 'cors';
-import { join } from 'path';
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // 中间件
-app.use(cors({
-  origin: '*',
-}));
-app.use(json());
+app.use(
+    cors({
+        origin: '*',
+    })
+);
+app.use(express.json());
 app.use(express.static('public'));
 
-// 英雄类型映射
-const heroTypeMap = {
-  1: '战士',
-  2: '法师', 
-  3: '坦克',
-  4: '刺客',
-  5: '射手',
-  6: '辅助'
-};
-
-// 分路映射
-const laneMap = {
-  '战士': ['上路', '打野'],
-  '法师': ['中路'],
-  '坦克': ['上路', '辅助'],
-  '刺客': ['打野', '中路'],
-  '射手': ['下路'],
-  '辅助': ['辅助']
-};
-
-// 全局变量存储英雄数据和已选择的英雄
-let heroData = {};
+// 数据存储
+let players = [];
+let teams = [];
+let laneAssignments = {};
 let selectedHeroes = new Set();
+let heroConfig = {};
 
-// 获取英雄数据
-async function fetchHeroData() {
-  try {
-    console.log('正在获取英雄数据...');
-    const response = await fetch('https://pvp.qq.com/web201605/js/herolist.json');
+// 加载英雄配置
+function loadHeroConfig() {
+    try {
+        const configPath = path.join(__dirname, 'config', 'heroes.json');
+        const configData = fs.readFileSync(configPath, 'utf8');
+        heroConfig = JSON.parse(configData);
+        console.log('英雄配置加载成功');
+    } catch (error) {
+        console.error('加载英雄配置失败:', error);
+        // 使用默认配置
+        heroConfig = {
+            top: ['亚瑟', '吕布', '关羽', '张飞', '典韦', '程咬金', '钟馗', '李信', '花木兰', '铠'],
+            jungle: ['李白', '韩信', '赵云', '兰陵王', '娜可露露', '阿轲', '百里玄策', '云中君', '镜', '澜'],
+            mid: ['妲己', '安琪拉', '王昭君', '貂蝉', '小乔', '甄姬', '杨玉环', '上官婉儿', '西施', '嫦娥'],
+            bot: ['后羿', '鲁班七号', '孙尚香', '虞姬', '黄忠', '马可波罗', '公孙离', '伽罗', '蒙犽', '艾琳'],
+            support: ['蔡文姬', '大乔', '小乔', '孙膑', '庄周', '张飞', '牛魔', '鬼谷子', '太乙真人', '鲁班大师']
+        };
+    }
+}
+
+// 初始化时加载配置
+loadHeroConfig();
+
+// 玩家类
+class Player {
+    constructor(name, gender) {
+        this.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        this.name = name;
+        this.gender = gender;
+        this.bannedHeroes = [];
+    }
+}
+
+// 路由
+
+// 获取所有玩家
+app.get('/api/players', (req, res) => {
+    res.json(players);
+});
+
+// 添加玩家
+app.post('/api/players', (req, res) => {
+    const { name, gender } = req.body;
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (!name || !gender) {
+        return res.status(400).json({ message: '姓名和性别不能为空' });
     }
     
-    const heroes = await response.json();
+    if (players.length >= 10) {
+        return res.status(400).json({ message: '最多只能添加10名玩家' });
+    }
     
-    // 按类型分组英雄
-    heroes.forEach(hero => {
-      const type = heroTypeMap[hero.hero_type] || '未知';
-      if (!heroData[type]) {
-        heroData[type] = [];
-      }
-      heroData[type].push({
-        id: hero.ename,
-        name: hero.cname,
-        title: hero.title,
-        type: type,
-        originalType: hero.hero_type
-      });
-    });
+    if (players.some(p => p.name === name)) {
+        return res.status(400).json({ message: '玩家姓名已存在' });
+    }
     
-    console.log('英雄数据加载完成');
-    return heroData;
-  } catch (error) {
-    console.error('获取英雄数据失败:', error.message);
-    return heroData;
-  }
-}
+    const player = new Player(name, gender);
+    players.push(player);
+    
+    res.status(201).json(player);
+});
+
+// 删除玩家
+app.delete('/api/players/:id', (req, res) => {
+    const { id } = req.params;
+    const index = players.findIndex(p => p.id === id);
+    
+    if (index === -1) {
+        return res.status(404).json({ message: '玩家不存在' });
+    }
+    
+    players.splice(index, 1);
+    res.json({ message: '玩家删除成功' });
+});
+
+// 分配团队
+app.post('/api/teams/assign', (req, res) => {
+    if (players.length !== 10) {
+        return res.status(400).json({ message: '需要10名玩家才能分配团队' });
+    }
+    
+    const females = players.filter(p => p.gender === 'female');
+    const males = players.filter(p => p.gender === 'male');
+    
+    // 确保女生人数均等
+    const team1Females = females.slice(0, Math.ceil(females.length / 2));
+    const team2Females = females.slice(Math.ceil(females.length / 2));
+    
+    // 男生随机分配
+    const shuffledMales = males.sort(() => Math.random() - 0.5);
+    const team1Males = shuffledMales.slice(0, Math.ceil(shuffledMales.length / 2));
+    const team2Males = shuffledMales.slice(Math.ceil(shuffledMales.length / 2));
+    
+    teams = [
+        { name: '蓝队', players: [...team1Females, ...team1Males] },
+        { name: '红队', players: [...team2Females, ...team2Males] }
+    ];
+    
+    res.json(teams);
+});
 
 // 获取分路列表
 app.get('/api/lanes', (req, res) => {
-  const lanes = ['上路', '中路', '下路', '打野', '辅助'];
-  res.json({ lanes });
+    const lanes = [
+        { id: 'top', name: '上路' },
+        { id: 'jungle', name: '打野' },
+        { id: 'mid', name: '中路' },
+        { id: 'bot', name: '下路' },
+        { id: 'support', name: '辅助' }
+    ];
+    res.json({ lanes });
 });
 
-// 随机选择分路
-app.get('/api/random-lane', (req, res) => {
-  const lanes = ['上路', '中路', '下路', '打野', '辅助'];
-  const randomLane = lanes[Math.floor(Math.random() * lanes.length)];
-  res.json({ lane: randomLane });
-});
-
-// 根据分路获取英雄
-app.get('/api/heroes/:lane', (req, res) => {
-  const { lane } = req.params;
-  
-  // 找出适合该分路的英雄类型
-  const suitableTypes = Object.keys(laneMap).filter(type => 
-    laneMap[type].includes(lane)
-  );
-  
-  // 收集所有适合的英雄
-  let availableHeroes = [];
-  suitableTypes.forEach(type => {
-    if (heroData[type]) {
-      availableHeroes = availableHeroes.concat(heroData[type]);
+// 分配分路
+app.post('/api/lanes/assign', (req, res) => {
+    if (players.length !== 10) {
+        return res.status(400).json({ message: '需要10名玩家才能分配分路' });
     }
-  });
-  
-  // 过滤掉已选择的英雄
-  availableHeroes = availableHeroes.filter(hero => 
-    !selectedHeroes.has(hero.id)
-  );
-  
-  res.json({ 
-    lane, 
-    heroes: availableHeroes,
-    count: availableHeroes.length 
-  });
+    
+    const lanes = ['top', 'jungle', 'mid', 'bot', 'support'];
+    const shuffledLanes = lanes.sort(() => Math.random() - 0.5);
+    
+    laneAssignments = {};
+    players.forEach((player, index) => {
+        laneAssignments[player.id] = shuffledLanes[index];
+    });
+    
+    res.json(laneAssignments);
 });
 
-// 随机选择英雄
-app.get('/api/random/:lane', (req, res) => {
-  const { lane } = req.params;
-  
-  // 找出适合该分路的英雄类型
-  const suitableTypes = Object.keys(laneMap).filter(type => 
-    laneMap[type].includes(lane)
-  );
-  
-  // 收集所有适合的英雄
-  let availableHeroes = [];
-  suitableTypes.forEach(type => {
-    if (heroData[type]) {
-      availableHeroes = availableHeroes.concat(heroData[type]);
+// 选择英雄
+app.post('/api/heroes/select', (req, res) => {
+    const { playerId, heroName } = req.body;
+    
+    if (!playerId || !heroName) {
+        return res.status(400).json({ message: '玩家ID和英雄名称不能为空' });
     }
-  });
-  
-  // 过滤掉已选择的英雄
-  availableHeroes = availableHeroes.filter(hero => 
-    !selectedHeroes.has(hero.id)
-  );
-  
-  if (availableHeroes.length === 0) {
-    return res.status(400).json({ 
-      error: '该分路没有可用的英雄了' 
-    });
-  }
-  
-  // 随机选择3个英雄
-  const selectedCount = Math.min(3, availableHeroes.length);
-  const randomHeroes = [];
-  
-  for (let i = 0; i < selectedCount; i++) {
-    const randomIndex = Math.floor(Math.random() * availableHeroes.length);
-    const hero = availableHeroes.splice(randomIndex, 1)[0];
-    randomHeroes.push(hero);
-    // 立即将选中的英雄标记为已选择，防止其他玩家选择
-    selectedHeroes.add(hero.id);
-  }
-  
-  res.json({ 
-    lane, 
-    heroes: randomHeroes,
-    selectedCount,
-    remainingCount: availableHeroes.length
-  });
+    
+    if (selectedHeroes.has(heroName)) {
+        return res.status(400).json({ message: '该英雄已被选择' });
+    }
+    
+    const player = players.find(p => p.id === playerId);
+    if (!player) {
+        return res.status(404).json({ message: '玩家不存在' });
+    }
+    
+    const lane = laneAssignments[playerId];
+    if (!lane) {
+        return res.status(400).json({ message: '玩家未分配分路' });
+    }
+    
+    const laneHeroes = heroConfig[lane] || [];
+    if (!laneHeroes.includes(heroName)) {
+        return res.status(400).json({ message: '该英雄不属于此分路' });
+    }
+    
+    selectedHeroes.add(heroName);
+    res.json({ message: '英雄选择成功', hero: heroName });
 });
 
-// 选择特定英雄
-app.post('/api/select-hero/:heroId', (req, res) => {
-  const { heroId } = req.params;
-  
-  // 检查英雄是否已被选择
-  if (selectedHeroes.has(heroId)) {
-    return res.status(400).json({ 
-      error: '该英雄已被其他玩家选择' 
-    });
-  }
-  
-  // 在所有类型中查找英雄
-  let hero = null;
-  for (const type in heroData) {
-    hero = heroData[type].find(h => h.id === heroId);
-    if (hero) break;
-  }
-  
-  if (!hero) {
-    return res.status(404).json({ 
-      error: '英雄不存在' 
-    });
-  }
-  
-  // 标记英雄为已选择
-  selectedHeroes.add(heroId);
-  
-  res.json({ 
-    message: '英雄选择成功',
-    hero 
-  });
-});
-
-// 重置已选择的英雄
+// 重置所有数据
 app.post('/api/reset', (req, res) => {
-  selectedHeroes.clear();
-  res.json({ message: '已重置所有选择' });
+    players = [];
+    teams = [];
+    laneAssignments = {};
+    selectedHeroes.clear();
+    res.json({ message: '重置成功' });
 });
 
-// 获取已选择的英雄
-app.get('/api/selected', (req, res) => {
-  const selectedHeroList = Array.from(selectedHeroes).map(id => {
-    // 在所有类型中查找英雄
-    for (const type in heroData) {
-      const hero = heroData[type].find(h => h.id === id);
-      if (hero) return hero;
+// 管理端API
+
+// 获取英雄配置
+app.get('/api/admin/hero-config', (req, res) => {
+    res.json(heroConfig);
+});
+
+// 保存英雄配置
+app.post('/api/admin/hero-config', (req, res) => {
+    const newConfig = req.body;
+    
+    try {
+        const configPath = path.join(__dirname, 'config', 'heroes.json');
+        fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2), 'utf8');
+        heroConfig = newConfig;
+        res.json({ message: '配置保存成功' });
+    } catch (error) {
+        console.error('保存配置失败:', error);
+        res.status(500).json({ message: '保存配置失败' });
     }
-    return null;
-  }).filter(hero => hero !== null);
-  
-  res.json({ selectedHeroes: selectedHeroList });
 });
 
-// 获取指定分路的可用英雄数量
-app.get('/api/available-count/:lane', (req, res) => {
-  const { lane } = req.params;
-  
-  // 找出适合该分路的英雄类型
-  const suitableTypes = Object.keys(laneMap).filter(type => 
-    laneMap[type].includes(lane)
-  );
-  
-  // 收集所有适合的英雄
-  let availableHeroes = [];
-  suitableTypes.forEach(type => {
-    if (heroData[type]) {
-      availableHeroes = availableHeroes.concat(heroData[type]);
-    }
-  });
-  
-  // 过滤掉已选择的英雄
-  availableHeroes = availableHeroes.filter(hero => 
-    !selectedHeroes.has(hero.id)
-  );
-  
-  res.json({ 
-    lane, 
-    availableCount: availableHeroes.length,
-    totalCount: availableHeroes.length + selectedHeroes.size
-  });
+// 生成默认配置
+app.post('/api/admin/generate-config', (req, res) => {
+    // 重新加载配置文件
+    loadHeroConfig();
+    res.json({ message: '默认配置生成成功', config: heroConfig });
 });
 
-// 主页路由
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'public', 'index.html'));
+// 获取系统状态
+app.get('/api/admin/status', (req, res) => {
+    const status = {
+        server: 'online',
+        heroData: Object.keys(heroConfig).length > 0 ? 'loaded' : 'empty',
+        config: Object.keys(heroConfig).length > 0 ? 'configured' : 'not_configured',
+        players: players.length,
+        teams: teams.length,
+        laneAssignments: Object.keys(laneAssignments).length,
+        selectedHeroes: selectedHeroes.size
+    };
+    
+    res.json(status);
 });
 
-// 启动服务器
-async function startServer() {
-  try {
-    await fetchHeroData();
-    app.listen(PORT, () => {
-      console.log(`服务器运行在 http://localhost:${PORT}`);
+// 获取系统状态（客户端用）
+app.get('/api/status', (req, res) => {
+    res.json({ 
+        status: 'online',
+        timestamp: new Date().toISOString()
     });
-  } catch (error) {
-    console.error('服务器启动失败:', error);
-  }
+});
+
+// 获取配置（管理端用）
+app.get('/api/admin/config', (req, res) => {
+    res.json({ 
+        laneConfig: heroConfig
+    });
+});
+
+// 保存配置（管理端用）
+app.post('/api/admin/save-config', (req, res) => {
+    const { laneConfig } = req.body;
+    
+    try {
+        const configPath = path.join(__dirname, 'config', 'heroes.json');
+        fs.writeFileSync(configPath, JSON.stringify(laneConfig, null, 2), 'utf8');
+        heroConfig = laneConfig;
+        res.json({ 
+            message: '配置保存成功',
+            laneConfig: heroConfig
+        });
+    } catch (error) {
+        console.error('保存配置失败:', error);
+        res.status(500).json({ message: '保存配置失败' });
+    }
+});
+
+// 加载配置（管理端用）
+app.get('/api/admin/load-config', (req, res) => {
+    try {
+        // 重新加载配置文件
+        loadHeroConfig();
+        res.json({ 
+            message: '配置加载成功',
+            laneConfig: heroConfig
+        });
+    } catch (error) {
+        console.error('加载配置失败:', error);
+        res.status(500).json({ message: '加载配置失败' });
+    }
+});
+
+// 管理端玩家管理
+
+// 管理端添加玩家
+app.post('/api/admin/players', (req, res) => {
+    const { name, gender, bannedHeroes = [] } = req.body;
+    
+    if (!name || !gender) {
+        return res.status(400).json({ message: '姓名和性别不能为空' });
+    }
+    
+    if (players.length >= 10) {
+        return res.status(400).json({ message: '最多只能添加10名玩家' });
+    }
+    
+    if (players.some(p => p.name === name)) {
+        return res.status(400).json({ message: '玩家姓名已存在' });
+    }
+    
+    const player = new Player(name, gender);
+    player.bannedHeroes = bannedHeroes;
+    players.push(player);
+    
+    res.status(201).json(player);
+});
+
+// 管理端删除玩家
+app.delete('/api/admin/players/:id', (req, res) => {
+    const { id } = req.params;
+    const index = players.findIndex(p => p.id === id);
+    
+    if (index === -1) {
+        return res.status(404).json({ message: '玩家不存在' });
+    }
+    
+    players.splice(index, 1);
+    res.json({ message: '玩家删除成功' });
+});
+
+// 管理端编辑玩家
+app.put('/api/admin/players/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, gender, bannedHeroes } = req.body;
+    
+    const player = players.find(p => p.id === id);
+    if (!player) {
+        return res.status(404).json({ message: '玩家不存在' });
+    }
+    
+    if (name) player.name = name;
+    if (gender) player.gender = gender;
+    if (bannedHeroes) player.bannedHeroes = bannedHeroes;
+    
+    res.json(player);
+});
+
+// 获取所有英雄数据（用于管理端选择）
+app.get('/api/admin/all-heroes', (req, res) => {
+    const allHeroes = [];
+    Object.entries(heroConfig).forEach(([lane, heroes]) => {
+        heroes.forEach(hero => {
+            allHeroes.push({
+                name: hero,
+                lane: lane,
+                laneName: getLaneDisplayName(lane)
+            });
+        });
+    });
+    
+    res.json(allHeroes);
+});
+
+// 获取分路显示名称
+function getLaneDisplayName(lane) {
+    const laneNames = {
+        'top': '上路',
+        'jungle': '打野',
+        'mid': '中路',
+        'bot': '下路',
+        'support': '辅助'
+    };
+    return laneNames[lane] || lane;
 }
 
-startServer(); 
+// 启动服务器
+app.listen(PORT, () => {
+    console.log(`服务器运行在 http://localhost:${PORT}`);
+    console.log('英雄配置已加载');
+}); 

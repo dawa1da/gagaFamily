@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王者荣耀5v5比赛系统 - 管理端</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">王者荣耀5v5比赛系统</h1>
+            <p class="subtitle">管理端 · 玩家管理 · 英雄配置</p>
+            <div class="admin-nav">
+                <a href="index.html" class="btn btn-secondary">返回客户端</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <!-- 系统状态 -->
+            <section class="admin-section system-status">
+                <h2>系统状态</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-label">服务器状态</span>
+                        <span class="status-value" id="serverStatus">检查中...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">英雄数据</span>
+                        <span class="status-value" id="heroDataStatus">检查中...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">配置状态</span>
+                        <span class="status-value" id="configStatus">未配置</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 玩家管理区域 -->
+            <section class="admin-section player-management-admin">
+                <h2>玩家管理</h2>
+                <div class="admin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>玩家姓名</label>
+                            <input type="text" id="adminPlayerName" placeholder="输入玩家姓名" maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label>性别</label>
+                            <select id="adminPlayerGender">
+                                <option value="">选择性别</option>
+                                <option value="male">男</option>
+                                <option value="female">女</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label>禁用英雄</label>
+                            <div class="banned-heroes-container">
+                                <div class="banned-heroes-list" id="bannedHeroesList">
+                                    <!-- 禁用的英雄将在这里显示 -->
+                                </div>
+                                <button class="btn btn-secondary" id="selectBannedHeroesBtn">选择禁用英雄</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" id="adminAddPlayerBtn">添加玩家</button>
+                    </div>
+                </div>
+                
+                <div class="admin-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">总人数</span>
+                        <span class="stat-value" id="adminTotalPlayers">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">男生</span>
+                        <span class="stat-value" id="adminMaleCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">女生</span>
+                        <span class="stat-value" id="adminFemaleCount">0</span>
+                    </div>
+                </div>
+                
+                <div class="admin-player-list" id="adminPlayerList">
+                    <!-- 玩家列表将在这里动态生成 -->
+                </div>
+            </section>
+
+            <!-- 分路英雄配置区域 -->
+            <section class="admin-section lane-hero-config">
+                <h2>分路英雄配置</h2>
+                <div class="config-actions">
+                    <button class="btn btn-primary" id="generateDefaultConfigBtn">生成默认配置</button>
+                    <button class="btn btn-secondary" id="saveConfigBtn">保存配置</button>
+                    <button class="btn btn-secondary" id="loadConfigBtn">加载配置</button>
+                </div>
+                
+                <div class="lane-config-grid" id="laneConfigGrid">
+                    <!-- 分路配置将在这里动态生成 -->
+                </div>
+            </section>
+        </main>
+
+        <!-- 英雄选择模态框 -->
+        <div class="modal" id="heroSelectModal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>选择禁用英雄</h3>
+                    <button class="modal-close" id="closeHeroModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="hero-search">
+                        <input type="text" id="heroSearchInput" placeholder="搜索英雄...">
+                    </div>
+                    <div class="hero-grid" id="heroSelectGrid">
+                        <!-- 英雄选择网格 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelHeroSelect">取消</button>
+                    <button class="btn btn-primary" id="confirmHeroSelect">确认选择</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 加载提示 -->
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>正在处理...</p>
+        </div>
+
+        <!-- 错误提示 -->
+        <div class="error" id="error" style="display: none;">
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html> 
