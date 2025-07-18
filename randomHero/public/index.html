@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王者荣耀英雄随机选择</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">王者荣耀英雄随机选择</h1>
+            <p class="subtitle">5v5 对战英雄分配系统</p>
+        </header>
+
+        <main class="main">
+            <!-- 随机分路选择区域 -->
+            <section class="lane-selection">
+                <h2>随机选择分路</h2>
+                <div class="random-lane-section">
+                    <button class="btn btn-primary random-lane-btn" id="randomLaneBtn">
+                        <span class="btn-icon">🎲</span>
+                        随机生成分路
+                    </button>
+                    <div class="selected-lane-display" id="selectedLaneDisplay" style="display: none;">
+                        <h3>已选择分路：<span id="currentLaneName"></span></h3>
+                        <button class="btn btn-secondary" id="changeLaneBtn">重新选择</button>
+                    </div>
+                </div>
+                
+                <div class="lane-grid" id="laneGrid" style="display: none;">
+                    <h3>手动选择分路</h3>
+                    <div class="lane-cards">
+                        <div class="lane-card" data-lane="上路">
+                            <div class="lane-icon">⚔️</div>
+                            <h3>上路</h3>
+                            <p>战士/坦克</p>
+                        </div>
+                        <div class="lane-card" data-lane="中路">
+                            <div class="lane-icon">🔮</div>
+                            <h3>中路</h3>
+                            <p>法师/刺客</p>
+                        </div>
+                        <div class="lane-card" data-lane="下路">
+                            <div class="lane-icon">🏹</div>
+                            <h3>下路</h3>
+                            <p>射手</p>
+                        </div>
+                        <div class="lane-card" data-lane="打野">
+                            <div class="lane-icon">🗡️</div>
+                            <h3>打野</h3>
+                            <p>刺客/战士</p>
+                        </div>
+                        <div class="lane-card" data-lane="辅助">
+                            <div class="lane-icon">🛡️</div>
+                            <h3>辅助</h3>
+                            <p>辅助/坦克</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 英雄展示区域 -->
+            <section class="hero-display" id="heroDisplay" style="display: none;">
+                <h2 id="selectedLaneTitle">已选择分路</h2>
+                <div class="hero-grid" id="heroGrid">
+                    <!-- 英雄卡片将在这里动态生成 -->
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="backBtn">返回选择分路</button>
+                </div>
+            </section>
+
+            <!-- 已选择英雄展示 -->
+            <section class="selected-heroes">
+                <h2>本场已选择英雄</h2>
+                <div class="selected-heroes-grid" id="selectedHeroesGrid">
+                    <!-- 已选择的英雄将在这里显示 -->
+                </div>
+                <div class="reset-section">
+                    <button class="btn btn-danger" id="resetBtn">重置所有选择</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- 加载提示 -->
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>正在加载英雄数据...</p>
+        </div>
+
+        <!-- 错误提示 -->
+        <div class="error" id="error" style="display: none;">
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
