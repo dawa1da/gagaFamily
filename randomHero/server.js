@@ -12,8 +12,8 @@ app.use(
         origin: '*',
     })
 );
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-app.use(express.static('public'));
 
 // 数据存储
 let players = [];
@@ -21,6 +21,7 @@ let teams = [];
 let laneAssignments = {};
 let selectedHeroes = new Set();
 let heroConfig = {};
+let playersConfig = {};
 
 // 加载英雄配置
 function loadHeroConfig() {
@@ -42,8 +43,35 @@ function loadHeroConfig() {
     }
 }
 
+// 加载玩家配置
+function loadPlayersConfig() {
+    try {
+        const configPath = path.join(__dirname, 'config', 'players.json');
+        const configData = fs.readFileSync(configPath, 'utf8');
+        playersConfig = JSON.parse(configData);
+        console.log('玩家配置加载成功');
+    } catch (error) {
+        console.error('加载玩家配置失败:', error);
+        playersConfig = { players: [] };
+    }
+}
+
+// 保存玩家配置
+function savePlayersConfig() {
+    try {
+        const configPath = path.join(__dirname, 'config', 'players.json');
+        fs.writeFileSync(configPath, JSON.stringify(playersConfig, null, 2), 'utf8');
+        console.log('玩家配置保存成功');
+        return true;
+    } catch (error) {
+        console.error('保存玩家配置失败:', error);
+        return false;
+    }
+}
+
 // 初始化时加载配置
 loadHeroConfig();
+loadPlayersConfig();
 
 // 玩家类
 class Player {
@@ -59,7 +87,7 @@ class Player {
 
 // 获取所有玩家
 app.get('/api/players', (req, res) => {
-    res.json(players);
+    res.json(playersConfig.players);
 });
 
 // 添加玩家
@@ -70,31 +98,46 @@ app.post('/api/players', (req, res) => {
         return res.status(400).json({ message: '姓名和性别不能为空' });
     }
     
-    if (players.length >= 10) {
-        return res.status(400).json({ message: '最多只能添加10名玩家' });
+    if (playersConfig.players.length >= 20) {
+        return res.status(400).json({ message: '最多只能添加20名玩家' });
     }
     
-    if (players.some(p => p.name === name)) {
+    if (playersConfig.players.some(p => p.name === name)) {
         return res.status(400).json({ message: '玩家姓名已存在' });
     }
     
-    const player = new Player(name, gender);
-    players.push(player);
+    const player = {
+        id: 'player_' + Date.now().toString(),
+        name: name,
+        gender: gender,
+        bannedHeroes: []
+    };
     
-    res.status(201).json(player);
+    playersConfig.players.push(player);
+    
+    if (savePlayersConfig()) {
+        res.status(201).json(player);
+    } else {
+        res.status(500).json({ message: '保存失败' });
+    }
 });
 
 // 删除玩家
 app.delete('/api/players/:id', (req, res) => {
     const { id } = req.params;
-    const index = players.findIndex(p => p.id === id);
+    const index = playersConfig.players.findIndex(p => p.id === id);
     
     if (index === -1) {
         return res.status(404).json({ message: '玩家不存在' });
     }
     
-    players.splice(index, 1);
-    res.json({ message: '玩家删除成功' });
+    playersConfig.players.splice(index, 1);
+    
+    if (savePlayersConfig()) {
+        res.json({ message: '玩家删除成功' });
+    } else {
+        res.status(500).json({ message: '保存失败' });
+    }
 });
 
 // 分配团队
@@ -185,7 +228,6 @@ app.post('/api/heroes/select', (req, res) => {
 
 // 重置所有数据
 app.post('/api/reset', (req, res) => {
-    players = [];
     teams = [];
     laneAssignments = {};
     selectedHeroes.clear();
@@ -227,7 +269,7 @@ app.get('/api/admin/status', (req, res) => {
         server: 'online',
         heroData: Object.keys(heroConfig).length > 0 ? 'loaded' : 'empty',
         config: Object.keys(heroConfig).length > 0 ? 'configured' : 'not_configured',
-        players: players.length,
+        players: playersConfig.players.length,
         teams: teams.length,
         laneAssignments: Object.keys(laneAssignments).length,
         selectedHeroes: selectedHeroes.size
@@ -286,6 +328,11 @@ app.get('/api/admin/load-config', (req, res) => {
 
 // 管理端玩家管理
 
+// 管理端获取所有玩家
+app.get('/api/admin/players', (req, res) => {
+    res.json(playersConfig.players);
+});
+
 // 管理端添加玩家
 app.post('/api/admin/players', (req, res) => {
     const { name, gender, bannedHeroes = [] } = req.body;
@@ -294,32 +341,46 @@ app.post('/api/admin/players', (req, res) => {
         return res.status(400).json({ message: '姓名和性别不能为空' });
     }
     
-    if (players.length >= 10) {
-        return res.status(400).json({ message: '最多只能添加10名玩家' });
+    if (playersConfig.players.length >= 20) {
+        return res.status(400).json({ message: '最多只能添加20名玩家' });
     }
     
-    if (players.some(p => p.name === name)) {
+    if (playersConfig.players.some(p => p.name === name)) {
         return res.status(400).json({ message: '玩家姓名已存在' });
     }
     
-    const player = new Player(name, gender);
-    player.bannedHeroes = bannedHeroes;
-    players.push(player);
+    const player = {
+        id: 'player_' + Date.now().toString(),
+        name: name,
+        gender: gender,
+        bannedHeroes: bannedHeroes
+    };
     
-    res.status(201).json(player);
+    playersConfig.players.push(player);
+    
+    if (savePlayersConfig()) {
+        res.status(201).json(player);
+    } else {
+        res.status(500).json({ message: '保存失败' });
+    }
 });
 
 // 管理端删除玩家
 app.delete('/api/admin/players/:id', (req, res) => {
     const { id } = req.params;
-    const index = players.findIndex(p => p.id === id);
+    const index = playersConfig.players.findIndex(p => p.id === id);
     
     if (index === -1) {
         return res.status(404).json({ message: '玩家不存在' });
     }
     
-    players.splice(index, 1);
-    res.json({ message: '玩家删除成功' });
+    playersConfig.players.splice(index, 1);
+    
+    if (savePlayersConfig()) {
+        res.json({ message: '玩家删除成功' });
+    } else {
+        res.status(500).json({ message: '保存失败' });
+    }
 });
 
 // 管理端编辑玩家
@@ -327,7 +388,7 @@ app.put('/api/admin/players/:id', (req, res) => {
     const { id } = req.params;
     const { name, gender, bannedHeroes } = req.body;
     
-    const player = players.find(p => p.id === id);
+    const player = playersConfig.players.find(p => p.id === id);
     if (!player) {
         return res.status(404).json({ message: '玩家不存在' });
     }
@@ -336,7 +397,30 @@ app.put('/api/admin/players/:id', (req, res) => {
     if (gender) player.gender = gender;
     if (bannedHeroes) player.bannedHeroes = bannedHeroes;
     
-    res.json(player);
+    if (savePlayersConfig()) {
+        res.json(player);
+    } else {
+        res.status(500).json({ message: '保存失败' });
+    }
+});
+
+// 管理端更新玩家禁用英雄
+app.put('/api/admin/players/:id/banned-heroes', (req, res) => {
+    const { id } = req.params;
+    const { bannedHeroes } = req.body;
+    
+    const player = playersConfig.players.find(p => p.id === id);
+    if (!player) {
+        return res.status(404).json({ message: '玩家不存在' });
+    }
+    
+    player.bannedHeroes = bannedHeroes || [];
+    
+    if (savePlayersConfig()) {
+        res.json(player);
+    } else {
+        res.status(500).json({ message: '保存失败' });
+    }
 });
 
 // 获取所有英雄数据（用于管理端选择）

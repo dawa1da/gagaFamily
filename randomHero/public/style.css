@@ -158,6 +158,35 @@ body {
     margin-bottom: 20px;
 }
 
+/* 玩家信息提示样式 */
+.player-info {
+    background: rgba(255, 215, 0, 0.05);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.info-text {
+    color: #b8b8b8;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.info-text a {
+    color: #ffd700;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.info-text a:hover {
+    color: #ffed4e;
+    text-decoration: underline;
+}
+
 .form-group label {
     display: block;
     margin-bottom: 8px;

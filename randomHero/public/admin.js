@@ -38,7 +38,7 @@ const loading = document.getElementById('loading');
 const error = document.getElementById('error');
 const errorMessage = document.getElementById('errorMessage');
 
-const host = 'http://localhost:3000';
+const host = ''; // 'http://localhost:3000'; // 本地调试
 
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -124,18 +124,16 @@ function bindAdminEventListeners() {
 async function loadAdminData() {
     try {
         // 加载玩家数据
-        const playersResponse = await fetch(`${host}/api/players`);
+        const playersResponse = await fetch(`${host}/api/admin/players`);
         if (playersResponse.ok) {
-            const data = await playersResponse.json();
-            players = data.players;
+            players = await playersResponse.json();
             updateAdminPlayerDisplay();
         }
         
         // 加载英雄数据
-        const heroesResponse = await fetch(`${host}/api/all-heroes`);
+        const heroesResponse = await fetch(`${host}/api/admin/all-heroes`);
         if (heroesResponse.ok) {
-            const data = await heroesResponse.json();
-            allHeroes = data.heroes;
+            allHeroes = await heroesResponse.json();
         }
         
         // 加载配置数据
@@ -219,7 +217,7 @@ async function addPlayerAdmin() {
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.error || '添加玩家失败');
+            throw new Error(data.message || '添加玩家失败');
         }
         
         // 清空输入框
@@ -309,7 +307,7 @@ async function deletePlayerAdmin(playerId) {
         const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.error || '删除玩家失败');
+            throw new Error(data.message || '删除玩家失败');
         }
         
         // 重新加载玩家数据

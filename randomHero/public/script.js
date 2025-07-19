@@ -6,9 +6,6 @@ let selectedHeroes = {};
 let heroConfig = {};
 
 // DOM元素
-const playerNameInput = document.getElementById('playerName');
-const playerGenderSelect = document.getElementById('playerGender');
-const addPlayerBtn = document.getElementById('addPlayerBtn');
 const playerList = document.getElementById('playerList');
 const totalPlayersSpan = document.getElementById('totalPlayers');
 const maleCountSpan = document.getElementById('maleCount');
@@ -32,29 +29,22 @@ const success = document.getElementById('success');
 const errorMessage = document.getElementById('errorMessage');
 const successMessage = document.getElementById('successMessage');
 
-const host = 'http://localhost:3000';
+const host = ''; // 'http://localhost:3000'; // 本地调试
 
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
     loadHeroConfig();
+    loadPlayers();
     updatePlayerStats();
     setupEventListeners();
 });
 
 // 设置事件监听器
 function setupEventListeners() {
-    addPlayerBtn.addEventListener('click', addPlayer);
     assignTeamsBtn.addEventListener('click', assignTeams);
     assignLanesBtn.addEventListener('click', assignLanes);
     selectHeroesBtn.addEventListener('click', startHeroSelection);
     resetBtn.addEventListener('click', resetAll);
-    
-    // 回车键添加玩家
-    playerNameInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            addPlayer();
-        }
-    });
 }
 
 // 加载英雄配置
@@ -76,6 +66,20 @@ async function loadHeroConfig() {
     }
 }
 
+// 加载玩家数据
+async function loadPlayers() {
+    try {
+        const response = await fetch(`${host}/api/players`);
+        if (response.ok) {
+            players = await response.json();
+            updatePlayerList();
+            updatePlayerStats();
+        }
+    } catch (err) {
+        console.error('加载玩家数据失败:', err);
+    }
+}
+
 // 获取默认英雄配置
 function getDefaultHeroConfig() {
     return {
@@ -87,84 +91,7 @@ function getDefaultHeroConfig() {
     };
 }
 
-// 添加玩家
-async function addPlayer() {
-    const name = playerNameInput.value.trim();
-    const gender = playerGenderSelect.value;
-    
-    if (!name) {
-        showError('请输入玩家姓名');
-        return;
-    }
-    
-    if (!gender) {
-        showError('请选择性别');
-        return;
-    }
-    
-    if (players.length >= 10) {
-        showError('最多只能添加10名玩家');
-        return;
-    }
-    
-    if (players.some(p => p.name === name)) {
-        showError('玩家姓名已存在');
-        return;
-    }
-    
-    try {
-        showLoading();
-        const response = await fetch(`${host}/api/players`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, gender })
-        });
-        
-        if (response.ok) {
-            const player = await response.json();
-            players.push(player);
-            updatePlayerList();
-            updatePlayerStats();
-            clearPlayerForm();
-            showSuccess('玩家添加成功');
-        } else {
-            const error = await response.json();
-            showError(error.message || '添加玩家失败');
-        }
-    } catch (err) {
-        console.error('添加玩家失败:', err);
-        showError('网络错误，请重试');
-    } finally {
-        hideLoading();
-    }
-}
 
-// 删除玩家
-async function deletePlayer(playerId) {
-    try {
-        showLoading();
-        const response = await fetch(`${host}/api/players/${playerId}`, {
-            method: 'DELETE'
-        });
-        
-        if (response.ok) {
-            players = players.filter(p => p.id !== playerId);
-            updatePlayerList();
-            updatePlayerStats();
-            showSuccess('玩家删除成功');
-        } else {
-            const error = await response.json();
-            showError(error.message || '删除玩家失败');
-        }
-    } catch (err) {
-        console.error('删除玩家失败:', err);
-        showError('网络错误，请重试');
-    } finally {
-        hideLoading();
-    }
-}
 
 // 更新玩家列表
 function updatePlayerList() {
@@ -181,9 +108,6 @@ function updatePlayerList() {
                 </div>
             </div>
             ${player.lane ? `<div class="player-lane">${getLaneDisplayName(player.lane)}</div>` : ''}
-            <div class="player-actions">
-                <button class="btn btn-danger" onclick="deletePlayer('${player.id}')">删除</button>
-            </div>
         `;
         playerList.appendChild(playerCard);
     });
@@ -196,12 +120,7 @@ function updatePlayerStats() {
     femaleCountSpan.textContent = players.filter(p => p.gender === 'female').length;
 }
 
-// 清空玩家表单
-function clearPlayerForm() {
-    playerNameInput.value = '';
-    playerGenderSelect.value = '';
-    playerNameInput.focus();
-}
+
 
 // 分配团队
 async function assignTeams() {
@@ -430,20 +349,16 @@ async function resetAll() {
         });
         
         if (response.ok) {
-            players = [];
             teams = [];
             laneAssignments = {};
             selectedHeroes = {};
-            
-            updatePlayerList();
-            updatePlayerStats();
             
             teamGrid.style.display = 'none';
             laneGrid.style.display = 'none';
             heroGrid.style.display = 'none';
             resultsGrid.style.display = 'none';
             
-            showSuccess('已重置所有数据');
+            showSuccess('已重置比赛数据');
         } else {
             const error = await response.json();
             showError(error.message || '重置失败');

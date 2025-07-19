@@ -1,0 +1,70 @@
+{
+  "players": [
+    {
+      "id": "player_001",
+      "name": "玩家方",
+      "gender": "male",
+      "bannedHeroes": []
+    },
+    {
+      "id": "player_002", 
+      "name": "老季",
+      "gender": "male",
+      "bannedHeroes": []
+    },
+    {
+      "id": "player_003",
+      "name": "逍遥",
+      "gender": "male", 
+      "bannedHeroes": []
+    },
+    {
+      "id": "player_004",
+      "name": "小何",
+      "gender": "male",
+      "bannedHeroes": []
+    },
+    {
+      "id": "player_005",
+      "name": "全姐",
+      "gender": "female",
+      "bannedHeroes": []
+    },
+    {
+      "id": "player_006",
+      "name": "闪闪",
+      "gender": "female",
+      "bannedHeroes": []
+    },
+    {
+      "id": "player_007",
+      "name": "真心",
+      "gender": "female",
+      "bannedHeroes": []
+    },
+    {
+      "id": "player_008",
+      "name": "柯镇恶",
+      "gender": "male",
+      "bannedHeroes": []
+    },
+    {
+      "id": "player_009",
+      "name": "47",
+      "gender": "female",
+      "bannedHeroes": []
+    },
+    {
+      "id": "player_010",
+      "name": "小薰",
+      "gender": "female",
+      "bannedHeroes": []
+    },
+    {
+      "id": "player_011",
+      "name": "letuplay",
+      "gender": "male",
+      "bannedHeroes": []
+    }
+  ]
+} 
