@@ -141,6 +141,7 @@ async function assignTeams() {
             showSuccess('团队分配成功');
         } else {
             const error = await response.json();
+            console.error('团队分配失败:', error);
             showError(error.message || '团队分配失败');
         }
     } catch (err) {
@@ -203,6 +204,7 @@ async function assignLanes() {
             showSuccess('分路分配成功');
         } else {
             const error = await response.json();
+            console.error('分路分配失败:', error);
             showError(error.message || '分路分配失败');
         }
     } catch (err) {

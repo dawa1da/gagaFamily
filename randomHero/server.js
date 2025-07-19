@@ -30,7 +30,6 @@ function loadHeroConfig() {
         const configPath = path.join(__dirname, 'config', 'heroes.json');
         const configData = fs.readFileSync(configPath, 'utf8');
         heroConfig = JSON.parse(configData);
-        console.log('英雄配置加载成功');
     } catch (error) {
         console.error('加载英雄配置失败:', error);
         // 使用默认配置
@@ -50,7 +49,6 @@ function loadAllHeroesConfig() {
         const configPath = path.join(__dirname, 'config', 'herolist.json');
         const configData = fs.readFileSync(configPath, 'utf8');
         allHeroesConfig = JSON.parse(configData);
-        console.log('全英雄配置加载成功');
     } catch (error) {
         console.error('加载全英雄配置失败:', error);
         allHeroesConfig = { heroes: [] };
@@ -62,7 +60,6 @@ function saveHeroConfig() {
     try {
         const configPath = path.join(__dirname, 'config', 'heroes.json');
         fs.writeFileSync(configPath, JSON.stringify(heroConfig, null, 2), 'utf8');
-        console.log('英雄配置保存成功');
         return true;
     } catch (error) {
         console.error('保存英雄配置失败:', error);
@@ -76,7 +73,6 @@ function loadPlayersConfig() {
         const configPath = path.join(__dirname, 'config', 'players.json');
         const configData = fs.readFileSync(configPath, 'utf8');
         playersConfig = JSON.parse(configData);
-        console.log('玩家配置加载成功');
     } catch (error) {
         console.error('加载玩家配置失败:', error);
         playersConfig = { players: [] };
@@ -88,7 +84,6 @@ function savePlayersConfig() {
     try {
         const configPath = path.join(__dirname, 'config', 'players.json');
         fs.writeFileSync(configPath, JSON.stringify(playersConfig, null, 2), 'utf8');
-        console.log('玩家配置保存成功');
         return true;
     } catch (error) {
         console.error('保存玩家配置失败:', error);
@@ -170,12 +165,12 @@ app.delete('/api/players/:id', (req, res) => {
 
 // 分配团队
 app.post('/api/teams/assign', (req, res) => {
-    if (players.length !== 10) {
+    if (playersConfig.players.length !== 10) {
         return res.status(400).json({ message: '需要10名玩家才能分配团队' });
     }
     
-    const females = players.filter(p => p.gender === 'female');
-    const males = players.filter(p => p.gender === 'male');
+    const females = playersConfig.players.filter(p => p.gender === 'female');
+    const males = playersConfig.players.filter(p => p.gender === 'male');
     
     // 确保女生人数均等
     const team1Females = females.slice(0, Math.ceil(females.length / 2));
@@ -208,7 +203,7 @@ app.get('/api/lanes', (req, res) => {
 
 // 分配分路
 app.post('/api/lanes/assign', (req, res) => {
-    if (players.length !== 10) {
+    if (playersConfig.players.length !== 10) {
         return res.status(400).json({ message: '需要10名玩家才能分配分路' });
     }
     
@@ -216,7 +211,7 @@ app.post('/api/lanes/assign', (req, res) => {
     const shuffledLanes = lanes.sort(() => Math.random() - 0.5);
     
     laneAssignments = {};
-    players.forEach((player, index) => {
+    playersConfig.players.forEach((player, index) => {
         laneAssignments[player.id] = shuffledLanes[index];
     });
     
@@ -235,7 +230,7 @@ app.post('/api/heroes/select', (req, res) => {
         return res.status(400).json({ message: '该英雄已被选择' });
     }
     
-    const player = players.find(p => p.id === playerId);
+    const player = playersConfig.players.find(p => p.id === playerId);
     if (!player) {
         return res.status(404).json({ message: '玩家不存在' });
     }

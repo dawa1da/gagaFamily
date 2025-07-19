@@ -293,8 +293,8 @@ function createAdminPlayerCard(player) {
             </div>
         </div>
         <div class="admin-player-actions">
-            <button class="admin-edit-btn" onclick="editPlayer(${player.id})">编辑</button>
-            <button class="admin-delete-btn" onclick="deletePlayerAdmin(${player.id})">删除</button>
+            <button class="admin-edit-btn" onclick="editPlayer('${player.id}')">编辑</button>
+            <button class="admin-delete-btn" onclick="deletePlayerAdmin('${player.id}')">删除</button>
         </div>
     `;
     return card;
@@ -579,6 +579,7 @@ function removeHeroFromLane(lane, heroId) {
 
 // 更新分路英雄池显示
 function updateLaneHeroPoolsDisplay() {
+    
     laneHeroPoolsContainer.innerHTML = '';
     
     const lanes = ['top', 'jungle', 'mid', 'bot', 'support'];
@@ -586,6 +587,7 @@ function updateLaneHeroPoolsDisplay() {
     
     lanes.forEach((lane, index) => {
         const heroes = laneHeroPools[lane] || [];
+        
         const card = document.createElement('div');
         card.className = 'lane-hero-pools-card';
         card.innerHTML = `
@@ -597,14 +599,19 @@ function updateLaneHeroPoolsDisplay() {
             </div>
             <div class="lane-hero-pools-list">
                 ${heroes.length === 0 ? '<p style="color: #b8c5d6; text-align: center;">暂无英雄</p>' : 
-                    heroes.map(hero => `
-                        <div class="lane-hero-pools-item">
-                            <div class="lane-hero-pools-hero-info">
-                                <div class="lane-hero-pools-name">${hero}</div>
+                    heroes.map(heroName => {
+                        // 从全英雄列表中查找英雄信息
+                        const heroInfo = allHeroes.find(hero => hero.name === heroName);
+                        return `
+                            <div class="lane-hero-pools-item">
+                                <div class="lane-hero-pools-hero-info">
+                                    <div class="lane-hero-pools-name">${heroName}</div>
+                                    <div class="lane-hero-pools-type">${heroInfo ? heroInfo.type : '未知类型'}</div>
+                                </div>
+                                <button class="lane-hero-pools-remove" onclick="removeHeroFromLanePool('${lane}', '${heroName}')">删除</button>
                             </div>
-                            <button class="lane-hero-pools-remove" onclick="removeHeroFromLanePool('${lane}', '${hero}')">删除</button>
-                        </div>
-                    `).join('')
+                        `;
+                    }).join('')
                 }
             </div>
         `;
