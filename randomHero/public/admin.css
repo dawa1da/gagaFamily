@@ -598,6 +598,185 @@
     border-top: 1px solid rgba(255, 215, 0, 0.1);
 }
 
+/* 英雄池管理样式 */
+.hero-pool-management {
+    margin-top: 30px;
+}
+
+.hero-pool-info {
+    background: rgba(255, 215, 0, 0.05);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.lane-hero-pools {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.lane-hero-pools-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.lane-hero-pools-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.lane-hero-pools-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffd700;
+}
+
+.lane-hero-pools-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.lane-hero-pools-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.lane-hero-pools-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.lane-hero-pools-item:hover {
+    background: rgba(255, 215, 0, 0.1);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.lane-hero-pools-hero-info {
+    flex: 1;
+}
+
+.lane-hero-pools-name {
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.lane-hero-pools-type {
+    font-size: 0.85rem;
+    color: #b8b8b8;
+}
+
+.lane-hero-pools-remove {
+    background: linear-gradient(45deg, #8b0000, #a52a2a);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.lane-hero-pools-remove:hover {
+    background: linear-gradient(45deg, #a52a2a, #c04040);
+    transform: translateY(-1px);
+}
+
+/* 添加英雄模态框样式 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    border-radius: 15px;
+    padding: 0;
+    max-width: 800px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    background: rgba(255, 215, 0, 0.1);
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    color: #ffd700;
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 215, 0, 0.2);
+}
+
+.modal-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    background: rgba(255, 215, 0, 0.05);
+    padding: 20px;
+    border-top: 1px solid rgba(255, 215, 0, 0.2);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
     .container {
@@ -711,6 +890,37 @@
     
     .modal-footer .btn {
         width: 100%;
+    }
+
+    .lane-hero-pools {
+        grid-template-columns: 1fr;
+    }
+    
+    .lane-hero-pools-card {
+        padding: 15px;
+    }
+    
+    .lane-hero-pools-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .modal-header {
+        padding: 15px;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .modal-footer {
+        padding: 15px;
     }
 }
 

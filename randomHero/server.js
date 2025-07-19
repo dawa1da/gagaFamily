@@ -22,6 +22,7 @@ let laneAssignments = {};
 let selectedHeroes = new Set();
 let heroConfig = {};
 let playersConfig = {};
+let allHeroesConfig = {};
 
 // 加载英雄配置
 function loadHeroConfig() {
@@ -40,6 +41,32 @@ function loadHeroConfig() {
             bot: ['后羿', '鲁班七号', '孙尚香', '虞姬', '黄忠', '马可波罗', '公孙离', '伽罗', '蒙犽', '艾琳'],
             support: ['蔡文姬', '大乔', '小乔', '孙膑', '庄周', '张飞', '牛魔', '鬼谷子', '太乙真人', '鲁班大师']
         };
+    }
+}
+
+// 加载全英雄配置
+function loadAllHeroesConfig() {
+    try {
+        const configPath = path.join(__dirname, 'config', 'herolist.json');
+        const configData = fs.readFileSync(configPath, 'utf8');
+        allHeroesConfig = JSON.parse(configData);
+        console.log('全英雄配置加载成功');
+    } catch (error) {
+        console.error('加载全英雄配置失败:', error);
+        allHeroesConfig = { heroes: [] };
+    }
+}
+
+// 保存英雄配置
+function saveHeroConfig() {
+    try {
+        const configPath = path.join(__dirname, 'config', 'heroes.json');
+        fs.writeFileSync(configPath, JSON.stringify(heroConfig, null, 2), 'utf8');
+        console.log('英雄配置保存成功');
+        return true;
+    } catch (error) {
+        console.error('保存英雄配置失败:', error);
+        return false;
     }
 }
 
@@ -71,6 +98,7 @@ function savePlayersConfig() {
 
 // 初始化时加载配置
 loadHeroConfig();
+loadAllHeroesConfig();
 loadPlayersConfig();
 
 // 玩家类
@@ -425,18 +453,66 @@ app.put('/api/admin/players/:id/banned-heroes', (req, res) => {
 
 // 获取所有英雄数据（用于管理端选择）
 app.get('/api/admin/all-heroes', (req, res) => {
-    const allHeroes = [];
-    Object.entries(heroConfig).forEach(([lane, heroes]) => {
-        heroes.forEach(hero => {
-            allHeroes.push({
-                name: hero,
-                lane: lane,
-                laneName: getLaneDisplayName(lane)
-            });
-        });
-    });
+    res.json(allHeroesConfig.heroes || []);
+});
+
+// 获取分路英雄配置
+app.get('/api/admin/lane-heroes', (req, res) => {
+    res.json(heroConfig);
+});
+
+// 添加英雄到分路
+app.post('/api/admin/lane-heroes/:lane', (req, res) => {
+    const { lane } = req.params;
+    const { heroName } = req.body;
     
-    res.json(allHeroes);
+    if (!heroName) {
+        return res.status(400).json({ message: '英雄名称不能为空' });
+    }
+    
+    if (!heroConfig[lane]) {
+        heroConfig[lane] = [];
+    }
+    
+    if (heroConfig[lane].includes(heroName)) {
+        return res.status(400).json({ message: '该英雄已在此分路中' });
+    }
+    
+    // 检查英雄是否存在于全英雄列表中
+    const heroExists = allHeroesConfig.heroes.some(hero => hero.name === heroName);
+    if (!heroExists) {
+        return res.status(400).json({ message: '该英雄不存在于全英雄列表中' });
+    }
+    
+    heroConfig[lane].push(heroName);
+    
+    if (saveHeroConfig()) {
+        res.json({ message: '英雄添加成功', laneHeroes: heroConfig[lane] });
+    } else {
+        res.status(500).json({ message: '保存失败' });
+    }
+});
+
+// 从分路移除英雄
+app.delete('/api/admin/lane-heroes/:lane/:heroName', (req, res) => {
+    const { lane, heroName } = req.params;
+    
+    if (!heroConfig[lane]) {
+        return res.status(404).json({ message: '分路不存在' });
+    }
+    
+    const index = heroConfig[lane].indexOf(heroName);
+    if (index === -1) {
+        return res.status(404).json({ message: '英雄不在此分路中' });
+    }
+    
+    heroConfig[lane].splice(index, 1);
+    
+    if (saveHeroConfig()) {
+        res.json({ message: '英雄移除成功', laneHeroes: heroConfig[lane] });
+    } else {
+        res.status(500).json({ message: '保存失败' });
+    }
 });
 
 // 获取分路显示名称

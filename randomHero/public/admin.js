@@ -10,6 +10,7 @@ let laneConfig = {
 };
 let selectedBannedHeroes = [];
 let allHeroes = [];
+let laneHeroPools = {};
 
 // DOM 元素
 const adminPlayerName = document.getElementById('adminPlayerName');
@@ -25,6 +26,7 @@ const generateDefaultConfigBtn = document.getElementById('generateDefaultConfigB
 const saveConfigBtn = document.getElementById('saveConfigBtn');
 const loadConfigBtn = document.getElementById('loadConfigBtn');
 const laneConfigGrid = document.getElementById('laneConfigGrid');
+const laneHeroPoolsContainer = document.getElementById('laneHeroPools');
 const serverStatus = document.getElementById('serverStatus');
 const heroDataStatus = document.getElementById('heroDataStatus');
 const configStatus = document.getElementById('configStatus');
@@ -142,6 +144,13 @@ async function loadAdminData() {
             const data = await configResponse.json();
             laneConfig = data.laneConfig || laneConfig;
             updateLaneConfigDisplay();
+        }
+        
+        // 加载分路英雄池数据
+        const laneHeroesResponse = await fetch(`${host}/api/admin/lane-heroes`);
+        if (laneHeroesResponse.ok) {
+            laneHeroPools = await laneHeroesResponse.json();
+            updateLaneHeroPoolsDisplay();
         }
     } catch (err) {
         console.error('加载管理端数据失败:', err);
@@ -566,6 +575,170 @@ function addHeroToLane(lane) {
 function removeHeroFromLane(lane, heroId) {
     laneConfig[lane] = laneConfig[lane].filter(hero => hero.id !== heroId);
     updateLaneConfigDisplay();
+}
+
+// 更新分路英雄池显示
+function updateLaneHeroPoolsDisplay() {
+    laneHeroPoolsContainer.innerHTML = '';
+    
+    const lanes = ['top', 'jungle', 'mid', 'bot', 'support'];
+    const laneNames = ['上路', '打野', '中路', '下路', '辅助'];
+    
+    lanes.forEach((lane, index) => {
+        const heroes = laneHeroPools[lane] || [];
+        const card = document.createElement('div');
+        card.className = 'lane-hero-pools-card';
+        card.innerHTML = `
+            <div class="lane-hero-pools-header">
+                <div class="lane-hero-pools-title">${laneNames[index]} 英雄池 (${heroes.length})</div>
+                <div class="lane-hero-pools-actions">
+                    <button class="btn btn-secondary" onclick="showAddHeroModal('${lane}')">添加英雄</button>
+                </div>
+            </div>
+            <div class="lane-hero-pools-list">
+                ${heroes.length === 0 ? '<p style="color: #b8c5d6; text-align: center;">暂无英雄</p>' : 
+                    heroes.map(hero => `
+                        <div class="lane-hero-pools-item">
+                            <div class="lane-hero-pools-hero-info">
+                                <div class="lane-hero-pools-name">${hero}</div>
+                            </div>
+                            <button class="lane-hero-pools-remove" onclick="removeHeroFromLanePool('${lane}', '${hero}')">删除</button>
+                        </div>
+                    `).join('')
+                }
+            </div>
+        `;
+        laneHeroPoolsContainer.appendChild(card);
+    });
+}
+
+// 显示添加英雄模态框
+function showAddHeroModal(lane) {
+    // 创建模态框
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加英雄到${getLaneDisplayName(lane)}英雄池</h3>
+                <button class="modal-close" onclick="closeAddHeroModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="hero-search">
+                    <input type="text" id="addHeroSearchInput" placeholder="搜索英雄..." oninput="filterAddHeroes()">
+                </div>
+                <div class="hero-grid" id="addHeroGrid">
+                    ${allHeroes.map(hero => `
+                        <div class="hero-select-item" onclick="addHeroToLanePool('${lane}', '${hero.name}')">
+                            <div class="hero-select-avatar">${hero.name.charAt(0)}</div>
+                            <div class="hero-select-name">${hero.name}</div>
+                            <div class="hero-select-type">${hero.type}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddHeroModal()">取消</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// 关闭添加英雄模态框
+function closeAddHeroModal() {
+    const modal = document.querySelector('.modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// 过滤添加英雄列表
+function filterAddHeroes() {
+    const searchInput = document.getElementById('addHeroSearchInput');
+    const searchTerm = searchInput.value.toLowerCase();
+    const heroItems = document.querySelectorAll('#addHeroGrid .hero-select-item');
+    
+    heroItems.forEach(item => {
+        const heroName = item.querySelector('.hero-select-name').textContent.toLowerCase();
+        if (heroName.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// 添加英雄到分路英雄池
+async function addHeroToLanePool(lane, heroName) {
+    try {
+        showLoading();
+        
+        const response = await fetch(`${host}/api/admin/lane-heroes/${lane}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ heroName })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || '添加英雄失败');
+        }
+        
+        // 重新加载英雄池数据
+        const laneHeroesResponse = await fetch(`${host}/api/admin/lane-heroes`);
+        if (laneHeroesResponse.ok) {
+            laneHeroPools = await laneHeroesResponse.json();
+            updateLaneHeroPoolsDisplay();
+        }
+        
+        closeAddHeroModal();
+        showSuccess('英雄添加成功');
+        
+        hideLoading();
+    } catch (err) {
+        showError('添加英雄失败: ' + err.message);
+        hideLoading();
+    }
+}
+
+// 从分路英雄池移除英雄
+async function removeHeroFromLanePool(lane, heroName) {
+    if (!confirm(`确定要从${getLaneDisplayName(lane)}英雄池中移除${heroName}吗？`)) {
+        return;
+    }
+    
+    try {
+        showLoading();
+        
+        const response = await fetch(`${host}/api/admin/lane-heroes/${lane}/${encodeURIComponent(heroName)}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || '移除英雄失败');
+        }
+        
+        // 重新加载英雄池数据
+        const laneHeroesResponse = await fetch(`${host}/api/admin/lane-heroes`);
+        if (laneHeroesResponse.ok) {
+            laneHeroPools = await laneHeroesResponse.json();
+            updateLaneHeroPoolsDisplay();
+        }
+        
+        showSuccess('英雄移除成功');
+        
+        hideLoading();
+    } catch (err) {
+        showError('移除英雄失败: ' + err.message);
+        hideLoading();
+    }
 }
 
 // 显示加载状态
