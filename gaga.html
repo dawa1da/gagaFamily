@@ -665,7 +665,7 @@
 
 <script>
     // 全局配置变量
-    const API_BASE_URL = 'http://127.0.0.1:8008';
+    const API_BASE_URL = 'http://10.10.129.108:8008';
 
     // 应用状态变量
     let originalYamlContent = '';
@@ -959,6 +959,7 @@
                 nameInput.dataset.position = position;
                 nameInput.dataset.originalName = hero.name;
                 nameInput.className = 'hero-name-input';
+                nameInput.name = `heroName-${position}-${hero.name}`; 
                 nameInput.addEventListener('change', function() {
                     updateHeroName(hero.name, this.value, position);
                     this.dataset.originalName = this.value;
@@ -1190,24 +1191,17 @@
         // 从表单收集数据
         const form = document.getElementById('configForm');
         const formData = new FormData(form);
+        const heroInputs = document.querySelectorAll('.hero-name-input');
+        const heroes = [];
 
-        // 重构配置数据
-        if (currentConfigType === 'hero') {
-            configData.heroes = [];
-            const heroCount = Math.max(...Array.from(formData.keys())
-                .filter(key => key.startsWith('heroes['))
-                .map(key => parseInt(key.match(/\[(\d+)\]/)[1])) || [-1]) + 1;
-
-            for (let i = 0; i < heroCount; i++) {
-                const hero = {
-                    name: formData.get(`heroes[${i}].name`) || '',
-                    type: formData.get(`heroes[${i}].type`) || '',
-                    skill: formData.get(`heroes[${i}].skill`) || '',
-                    description: formData.get(`heroes[${i}].description`) || ''
-                };
-                configData.heroes.push(hero);
+        heroInputs.forEach(input => {
+            const name = input.value.trim();
+            const position = input.dataset.position;
+            if (name && position) {
+                heroes.push({ name, type: position });
             }
-        }
+        });
+        configData.heroes = heroes;
 
         // 转换为YAML格式
         const newYamlContent = generateYamlFromConfig(configData);
