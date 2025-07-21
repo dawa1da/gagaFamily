@@ -1,0 +1,31 @@
+users:
+  - name: "方"
+    banList: ["兰陵王"]
+    weightList: [ ]
+  - name: "季"
+    banList: [ ]
+    weightList: [ ]
+  - name: "来姐"
+    banList: [ ]
+    weightList: [ ]
+  - name: "真心"
+    banList: [ ]
+    weightList: [ ]
+  - name: "逍遥"
+    banList: [ ]
+    weightList: [ ]
+  - name: "lup"
+    banList: [ ]
+    weightList: [ ]
+  - name: "柯镇恶"
+    banList: [ ]
+    weightList: ["瑶*10000"]
+  - name: "小何"
+    banList: [ ]
+    weightList: [ ]
+  - name: "全姐"
+    banList: [ ]
+    weightList: [ ]
+  - name: "闪闪"
+    banList: [ ]
+    weightList: [ ]

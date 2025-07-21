@@ -12,18 +12,18 @@ import (
 
 func init() {
 	rand.NewSource(time.Now().UnixNano())
-	gameplay.InitUndercover()
 }
 
 func main() {
-	http.HandleFunc("/gagaFamily/undercoverGame", htmlHandler)
+	http.HandleFunc("/gagaFamily/game", htmlHandler)
+	//配置文件
+	http.HandleFunc("/gagaFamily/conf/heroYaml", gameplay.HeroYamlHandler)
+	http.HandleFunc("/gagaFamily/conf/heroEdit", gameplay.HeroEditHandler)
+	http.HandleFunc("/gagaFamily/conf/userYaml", gameplay.UserYamlHandler)
+	http.HandleFunc("/gagaFamily/conf/userEdit", gameplay.UserEditHandler)
+
 	//分组系统
 	http.HandleFunc("/gagaFamily/group/getGroup", gameplay.GetGroupHandler)
-	http.HandleFunc("/gagaFamily/group/getLuckyBoy", gameplay.GetLuckBoyHandler)
-
-	//卧底玩法
-	http.HandleFunc("/gagaFamily/undercoverGame/resetUndercover", gameplay.ResetUndercoverHandler)
-	http.HandleFunc("/gagaFamily/undercoverGame/getUndercover", gameplay.GetUndercoverHandler)
 
 	fmt.Println("Starting server on :8008")
 	_ = http.ListenAndServe(":8008", nil)
