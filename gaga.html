@@ -103,7 +103,7 @@
             border: none;
             border-radius: 12px;
             width: 90%;
-            max-width: 800px;
+            max-width: 900px;
             max-height: 90vh;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -163,6 +163,124 @@
             overflow-y: auto;
         }
 
+        /* 表单样式 */
+        .form-container {
+            text-align: left;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+
+        .form-section-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 7px 7px 0 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-section-content {
+            padding: 15px;
+            background-color: white;
+            border-radius: 0 0 7px 7px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group label {
+            min-width: 120px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .add-item-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .add-item-btn:hover {
+            background-color: #218838;
+        }
+
+        .remove-item-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .remove-item-btn:hover {
+            background-color: #c82333;
+        }
+
+        .hero-item {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+
+        .hero-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .hero-item-title {
+            font-weight: bold;
+            color: #007bff;
+        }
+
         .yaml-content {
             background-color: #f8f9fa;
             border: 1px solid #dee2e6;
@@ -201,10 +319,95 @@
             box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
         }
 
+        /* 选项卡样式 */
+        .tab-container {
+            margin-bottom: 20px;
+        }
+
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-button {
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            margin-right: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            top: 1px;
+        }
+
+        .tab-button.active {
+            background-color: #fff;
+            border-bottom: 1px solid #fff;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .hero-item-simple {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .hero-item-simple:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .tab-header {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+
+            .tab-button {
+                flex: 0 0 auto;
+            }
+
+            .hero-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+
         .edit-mode-toggle {
             margin-bottom: 15px;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 10px;
         }
 
         .modal-buttons {
@@ -213,6 +416,8 @@
             justify-content: flex-end;
             gap: 10px;
             flex-wrap: wrap;
+            border-top: 1px solid #dee2e6;
+            padding-top: 15px;
         }
 
         .modal-buttons button {
@@ -227,6 +432,17 @@
             padding: 8px 16px;
             font-size: 14px;
             border-radius: 6px;
+        }
+
+        .toggle-view-btn {
+            background-color: #6c757d;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+        }
+
+        .toggle-view-btn:hover {
+            background-color: #5a6268;
         }
 
         .save-btn {
@@ -258,7 +474,7 @@
                 align-items: center;
                 gap: 15px;
             }
-            
+
             button {
                 width: 200px;
                 padding: 18px 20px;
@@ -285,6 +501,16 @@
                 max-height: calc(85vh - 160px);
             }
 
+            .form-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .form-group label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+
             .yaml-content {
                 font-size: 12px;
                 padding: 12px;
@@ -309,14 +535,20 @@
             }
 
             .edit-mode-toggle {
-                justify-content: center;
-                margin-bottom: 20px;
+                flex-direction: column;
+                gap: 15px;
             }
 
-            .toggle-edit-btn {
+            .mode-switch {
                 width: 100%;
-                padding: 12px 20px;
-                font-size: 16px;
+                justify-content: center;
+            }
+
+            .toggle-edit-btn,
+            .toggle-view-btn {
+                width: 100px;
+                padding: 12px 16px;
+                font-size: 14px;
             }
 
             .close {
@@ -355,7 +587,7 @@
                 transform: none;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
-            
+
             button:active {
                 transform: scale(0.98);
             }
@@ -370,7 +602,7 @@
         <button class="config-button" onclick="urlRequest('/gagaFamily/conf/heroYaml', true, 'hero')">HERO</button>
         <button class="config-button" onclick="urlRequest('/gagaFamily/conf/userYaml', true, 'user')">USER</button>
     </div>
-    
+
     <!-- 分组按钮行 -->
     <div class="button-row">
         <button class="group-button" onclick="urlRequest('/gagaFamily/group/getGroup')">分组</button>
@@ -381,21 +613,50 @@
 <div id="yamlModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>YAML 配置内容</h2>
+            <h2 id="modalTitle">配置内容</h2>
             <span class="close" onclick="closeModal()">&times;</span>
         </div>
         <div class="modal-body">
             <div class="edit-mode-toggle">
-                <button id="toggleEditBtn" class="toggle-edit-btn" onclick="toggleEditMode()">编辑</button>
+                <div>
+                    <span id="modeIndicator">查看模式</span>
+                </div>
+                <div class="mode-switch">
+                    <button id="toggleFormBtn" class="toggle-view-btn" onclick="setViewMode('form')">表单</button>
+                    <button id="toggleYamlBtn" class="toggle-view-btn" onclick="setViewMode('yaml')">YAML</button>
+                    <button id="toggleEditBtn" class="toggle-edit-btn" onclick="toggleEditMode()">编辑</button>
+                </div>
             </div>
+
+            <!-- YAML查看容器 -->
             <div id="yamlViewContainer">
                 <pre id="yamlContent" class="yaml-content"></pre>
             </div>
+
+            <!-- YAML编辑容器 -->
             <div id="yamlEditContainer" style="display: none;">
                 <label for="yamlEditor"></label><textarea id="yamlEditor" class="yaml-editor" placeholder="在此编辑YAML配置..."></textarea>
                 <div class="modal-buttons">
                     <button class="cancel-btn" onclick="cancelEdit()">取消</button>
                     <button class="save-btn" onclick="saveChanges()">保存</button>
+                </div>
+            </div>
+
+            <!-- 表单查看容器 -->
+            <div id="formViewContainer" style="display: none;">
+                <div id="formContent" class="form-container">
+                    <!-- 表单内容将动态生成 -->
+                </div>
+            </div>
+
+            <!-- 表单编辑容器 -->
+            <div id="formEditContainer" style="display: none;">
+                <form id="configForm" class="form-container">
+                    <!-- 表单编辑内容将动态生成 -->
+                </form>
+                <div class="modal-buttons">
+                    <button class="cancel-btn" onclick="cancelEdit()">取消</button>
+                    <button class="save-btn" onclick="saveFormChanges()">保存</button>
                 </div>
             </div>
         </div>
@@ -404,12 +665,14 @@
 
 <script>
     // 全局配置变量
-    const API_BASE_URL = 'http://10.10.129.108:8008';
+    const API_BASE_URL = 'http://127.0.0.1:8008';
 
     // 应用状态变量
     let originalYamlContent = '';
     let currentEditMode = false;
+    let currentViewMode = 'yaml'; // 'yaml' 或 'form'
     let currentConfigType = '';
+    let configData = {};
 
     function urlRequest(url, isYaml = false, configType = '') {
         const apiUrl = API_BASE_URL + url;
@@ -438,11 +701,27 @@
     function showYamlModal(yamlContent, configType) {
         originalYamlContent = yamlContent;
         currentConfigType = configType;
+
+        try {
+            // 简单的YAML解析（仅支持基本结构）
+            configData = parseSimpleYaml(yamlContent);
+        } catch (error) {
+            console.error('YAML解析错误:', error);
+            configData = {};
+        }
+
         document.getElementById('yamlContent').textContent = yamlContent;
         document.getElementById('yamlEditor').value = yamlContent;
+
+        // 更新模态框标题
+        const title = configType === 'hero' ? 'HERO配置' :
+            configType === 'user' ? 'USER配置' : '配置内容';
+        document.getElementById('modalTitle').textContent = title;
+
         document.getElementById('yamlModal').style.display = 'block';
         setEditMode(false);
-        
+        setViewMode('yaml');
+
         // 阻止页面滚动
         document.body.style.overflow = 'hidden';
     }
@@ -453,50 +732,492 @@
         document.body.style.overflow = 'auto';
     }
 
+    function setViewMode(mode) {
+        currentViewMode = mode;
+
+        // 隐藏所有容器
+        document.getElementById('yamlViewContainer').style.display = 'none';
+        document.getElementById('yamlEditContainer').style.display = 'none';
+        document.getElementById('formViewContainer').style.display = 'none';
+        document.getElementById('formEditContainer').style.display = 'none';
+
+        // 更新按钮状态
+        document.getElementById('toggleFormBtn').className = mode === 'form' ? 'toggle-edit-btn' : 'toggle-view-btn';
+        document.getElementById('toggleYamlBtn').className = mode === 'yaml' ? 'toggle-edit-btn' : 'toggle-view-btn';
+
+        if (currentEditMode) {
+            // 编辑模式
+            if (mode === 'form') {
+                generateFormEdit();
+                document.getElementById('formEditContainer').style.display = 'block';
+            } else {
+                document.getElementById('yamlEditContainer').style.display = 'block';
+            }
+            document.getElementById('modeIndicator').textContent = '编辑模式';
+        } else {
+            // 查看模式
+            if (mode === 'form') {
+                generateFormView();
+                document.getElementById('formViewContainer').style.display = 'block';
+            } else {
+                document.getElementById('yamlViewContainer').style.display = 'block';
+            }
+            document.getElementById('modeIndicator').textContent = '查看模式';
+        }
+    }
+
     function toggleEditMode() {
         setEditMode(!currentEditMode);
     }
 
     function setEditMode(editMode) {
         currentEditMode = editMode;
-        if (editMode) {
-            // 切换到编辑模式
-            document.getElementById('yamlViewContainer').style.display = 'none';
-            document.getElementById('yamlEditContainer').style.display = 'block';
-            document.getElementById('toggleEditBtn').textContent = '查看';
-            
-            // 自动聚焦到编辑器
-            setTimeout(() => {
-                document.getElementById('yamlEditor').focus();
-            }, 100);
+        document.getElementById('toggleEditBtn').textContent = editMode ? '查看' : '编辑';
+        setViewMode(currentViewMode);
+    }
+
+    function generateFormView() {
+        const container = document.getElementById('formContent');
+        container.innerHTML = '';
+
+        if (currentConfigType === 'hero') {
+            generateHeroFormView(container);
+        } else if (currentConfigType === 'user') {
+            generateUserFormView(container);
         } else {
-            // 切换到查看模式
-            document.getElementById('yamlViewContainer').style.display = 'block';
-            document.getElementById('yamlEditContainer').style.display = 'none';
-            document.getElementById('toggleEditBtn').textContent = '编辑';
+            container.innerHTML = '<p>未知配置类型</p>';
         }
     }
 
-    function cancelEdit() {
-        // 取消编辑，恢复原始内容
-        document.getElementById('yamlEditor').value = originalYamlContent;
-        setEditMode(false);
+    function generateFormEdit() {
+        const container = document.getElementById('configForm');
+        container.innerHTML = '';
+
+        if (currentConfigType === 'hero') {
+            generateHeroFormEdit(container);
+        } else if (currentConfigType === 'user') {
+            generateUserFormEdit(container);
+        } else {
+            container.innerHTML = '<p>未知配置类型</p>';
+        }
     }
 
-    function saveChanges() {
-        // 保存编辑内容
-        const newContent = document.getElementById('yamlEditor').value;
-        
-        // 简单验证
-        if (!newContent.trim()) {
-            alert('内容不能为空');
+    function generateHeroFormView(container) {
+        if (!configData.heroes || !Array.isArray(configData.heroes)) {
+            container.innerHTML = '<p>没有找到英雄数据</p>';
             return;
         }
-        
-        document.getElementById('yamlContent').textContent = newContent;
-        originalYamlContent = newContent;
 
-        // 根据配置类型选择对应的编辑API端点
+        // 按位置分类英雄
+        const positionGroups = {};
+        configData.heroes.forEach(hero => {
+            const position = hero.type || '未分类';
+            if (!positionGroups[position]) {
+                positionGroups[position] = [];
+            }
+            positionGroups[position].push(hero.name);
+        });
+
+        // 创建选项卡容器
+        const tabContainer = document.createElement('div');
+        tabContainer.className = 'tab-container';
+        container.appendChild(tabContainer);
+
+        // 创建选项卡标题栏
+        const tabHeader = document.createElement('div');
+        tabHeader.className = 'tab-header';
+        tabContainer.appendChild(tabHeader);
+
+        // 创建选项卡内容区域
+        const positions = Object.keys(positionGroups);
+        positions.forEach((position, index) => {
+            // 创建选项卡按钮
+            const tabButton = document.createElement('div');
+            tabButton.className = `tab-button ${index === 0 ? 'active' : ''}`;
+            tabButton.textContent = position;
+            tabButton.onclick = function() {
+                // 移除所有活动状态
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                // 设置当前选项卡为活动状态
+                this.classList.add('active');
+                document.getElementById(`tab-content-${position}`).classList.add('active');
+            };
+            tabHeader.appendChild(tabButton);
+
+            // 创建选项卡内容
+            const tabContent = document.createElement('div');
+            tabContent.className = `tab-content ${index === 0 ? 'active' : ''}`;
+            tabContent.id = `tab-content-${position}`;
+            tabContainer.appendChild(tabContent);
+
+            // 创建英雄网格
+            const heroGrid = document.createElement('div');
+            heroGrid.className = 'hero-grid';
+            tabContent.appendChild(heroGrid);
+
+            // 添加英雄
+            positionGroups[position].forEach(heroName => {
+                const heroDiv = document.createElement('div');
+                heroDiv.className = 'hero-item-simple';
+                heroDiv.textContent = heroName;
+                heroGrid.appendChild(heroDiv);
+            });
+        });
+
+        // 如果没有分类，显示提示信息
+        if (positions.length === 0) {
+            container.innerHTML = '<p>没有找到英雄数据</p>';
+        }
+    }
+
+    function generateHeroFormEdit(container) {
+        if (!configData.heroes) {
+            configData.heroes = [];
+        }
+
+        // 按位置分类英雄
+        const positionGroups = {};
+        configData.heroes.forEach(hero => {
+            const position = hero.type || '未分类';
+            if (!positionGroups[position]) {
+                positionGroups[position] = [];
+            }
+            positionGroups[position].push(hero.name);
+        });
+
+        // 创建选项卡容器
+        const tabContainer = document.createElement('div');
+        tabContainer.className = 'tab-container';
+        container.appendChild(tabContainer);
+
+        // 创建选项卡标题栏
+        const tabHeader = document.createElement('div');
+        tabHeader.className = 'tab-header';
+        tabContainer.appendChild(tabHeader);
+
+        // 定义所有可能的位置
+        const allPositions = ['对抗路', '打野', '中路', '发育路', '游走', '未分类'];
+
+        // 确保所有位置都有对应的分组
+        allPositions.forEach(position => {
+            if (!positionGroups[position]) {
+                positionGroups[position] = [];
+            }
+        });
+
+        // 创建选项卡内容区域
+        const positions = allPositions.filter(pos => positionGroups.hasOwnProperty(pos));
+        positions.forEach((position, index) => {
+            // 创建选项卡按钮
+            const tabButton = document.createElement('div');
+            tabButton.className = `tab-button ${index === 0 ? 'active' : ''}`;
+            tabButton.textContent = position;
+            tabButton.onclick = function() {
+                // 移除所有活动状态
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                // 设置当前选项卡为活动状态
+                this.classList.add('active');
+                document.getElementById(`tab-edit-content-${position}`).classList.add('active');
+            };
+            tabHeader.appendChild(tabButton);
+
+            // 创建选项卡内容
+            const tabContent = document.createElement('div');
+            tabContent.className = `tab-content ${index === 0 ? 'active' : ''}`;
+            tabContent.id = `tab-edit-content-${position}`;
+            tabContainer.appendChild(tabContent);
+
+            // 添加标题和添加按钮
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'form-section-header';
+            headerDiv.innerHTML = `
+                <span>${position}英雄</span>
+                <button type="button" class="add-item-btn" onclick="addHeroToPosition('${position}')">添加英雄</button>
+            `;
+            tabContent.appendChild(headerDiv);
+
+            // 创建英雄列表区域
+            const heroListDiv = document.createElement('div');
+            heroListDiv.className = 'form-section-content';
+            heroListDiv.id = `heroEditList-${position}`;
+            tabContent.appendChild(heroListDiv);
+
+            // 添加该位置的所有英雄
+            const positionHeroes = configData.heroes.filter(hero => hero.type === position);
+            positionHeroes.forEach(hero => {
+                const heroDiv = document.createElement('div');
+                heroDiv.className = 'hero-item-simple';
+
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.value = hero.name;
+                nameInput.placeholder = '输入英雄名称';
+                nameInput.dataset.position = position;
+                nameInput.dataset.originalName = hero.name;
+                nameInput.className = 'hero-name-input';
+                nameInput.addEventListener('change', function() {
+                    updateHeroName(hero.name, this.value, position);
+                    this.dataset.originalName = this.value;
+                });
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'remove-item-btn';
+                removeBtn.textContent = '删除';
+                removeBtn.addEventListener('click', function() {
+                    removeHeroFromPosition(hero.name, position);
+                    heroDiv.remove();
+                });
+
+                heroDiv.appendChild(nameInput);
+                heroDiv.appendChild(removeBtn);
+                heroListDiv.appendChild(heroDiv);
+            });
+        });
+    }
+
+    function addHeroItem() {
+        const heroList = document.getElementById('heroEditList');
+        const newHero = { name: '', type: '', skill: '', description: '' };
+        configData.heroes.push(newHero);
+        addHeroEditItem(heroList, newHero, configData.heroes.length - 1);
+    }
+
+    function addHeroEditItem(container, hero, index) {
+        const heroDiv = document.createElement('div');
+        heroDiv.className = 'hero-item';
+        heroDiv.innerHTML = `
+            <div class="hero-item-header">
+                <div class="hero-item-title">英雄 #${index + 1}</div>
+                <button type="button" class="remove-item-btn" onclick="removeHeroItem(${index})">删除</button>
+            </div>
+            <div class="form-group">
+                <label>名称:</label>
+                <input type="text" name="heroes[${index}].name" value="${hero.name || ''}" placeholder="输入英雄名称">
+            </div>
+            <div class="form-group">
+                <label>类型:</label>
+                <select name="heroes[${index}].type">
+                    <option value="">选择位置</option>
+                    <option value="对抗路" ${hero.type === '对抗路' ? 'selected' : ''}>对抗路</option>
+                    <option value="打野" ${hero.type === '打野' ? 'selected' : ''}>打野</option>
+                    <option value="中路" ${hero.type === '中路' ? 'selected' : ''}>中路</option>
+                    <option value="发育路" ${hero.type === '发育路' ? 'selected' : ''}>发育路</option>
+                    <option value="游走" ${hero.type === '游走' ? 'selected' : ''}>游走</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>技能:</label>
+                <input type="text" name="heroes[${index}].skill" value="${hero.skill || ''}" placeholder="输入技能名称">
+            </div>
+            <div class="form-group">
+                <label>描述:</label>
+                <textarea name="heroes[${index}].description" placeholder="输入英雄描述">${hero.description || ''}</textarea>
+            </div>
+        `;
+        container.appendChild(heroDiv);
+    }
+
+    function removeHeroItem(index) {
+        configData.heroes.splice(index, 1);
+        generateFormEdit(); // 重新生成表单
+    }
+
+    function addHeroToPosition(position) {
+        if (!configData.heroes) {
+            configData.heroes = [];
+        }
+
+        // 创建新英雄对象
+        const newHero = {
+            name: '',
+            type: position,
+            skill: '',
+            description: ''
+        };
+
+        // 添加到配置数据
+        configData.heroes.push(newHero);
+
+        // 获取该位置的英雄列表容器
+        const heroListDiv = document.getElementById(`heroEditList-${position}`);
+
+        // 创建新英雄元素
+        const heroDiv = document.createElement('div');
+        heroDiv.className = 'hero-item-simple';
+
+        // 创建名称输入框
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.value = '';
+        nameInput.placeholder = '输入英雄名称';
+        nameInput.dataset.position = position;
+        nameInput.dataset.originalName = '';
+        nameInput.className = 'hero-name-input';
+        nameInput.addEventListener('change', function() {
+            updateHeroName(this.dataset.originalName, this.value, position);
+            this.dataset.originalName = this.value;
+        });
+
+        // 创建删除按钮
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-item-btn';
+        removeBtn.textContent = '删除';
+        removeBtn.addEventListener('click', function() {
+            removeHeroFromPosition(nameInput.value, position);
+            heroDiv.remove();
+        });
+
+        // 组装并添加到容器
+        heroDiv.appendChild(nameInput);
+        heroDiv.appendChild(removeBtn);
+        heroListDiv.appendChild(heroDiv);
+
+        // 聚焦到新创建的输入框
+        nameInput.focus();
+    }
+
+    function removeHeroFromPosition(heroName, position) {
+        if (!heroName) return;
+
+        // 查找并移除英雄
+        const index = configData.heroes.findIndex(hero => 
+            hero.name === heroName && hero.type === position);
+
+        if (index !== -1) {
+            configData.heroes.splice(index, 1);
+        }
+    }
+
+    function updateHeroName(oldName, newName, position) {
+        if (!newName) return;
+
+        // 查找并更新英雄名称
+        const hero = configData.heroes.find(hero => 
+            hero.name === oldName && hero.type === position);
+
+        if (hero) {
+            hero.name = newName;
+        }
+    }
+
+    function generateUserFormView(container) {
+        // 用户配置的表单视图生成逻辑
+        container.innerHTML = '<p>用户配置表单视图（待实现）</p>';
+    }
+
+    function generateUserFormEdit(container) {
+        // 用户配置的表单编辑逻辑
+        container.innerHTML = '<p>用户配置表单编辑（待实现）</p>';
+    }
+
+    function parseSimpleYaml(yamlText) {
+        // 简单的YAML解析器，支持位置分组结构
+        const lines = yamlText.split('\n');
+        const result = {};
+        let currentArray = null;
+        let currentObject = null;
+        let currentKey = null;
+
+        for (let line of lines) {
+            line = line.trim();
+            if (!line || line.startsWith('#')) continue;
+
+            if (line.endsWith(':')) {
+                // 数组或对象开始
+                currentKey = line.slice(0, -1).trim();
+                if (currentKey === 'heroes') {
+                    // 标准heroes结构
+                    result[currentKey] = [];
+                    currentArray = result[currentKey];
+                } else {
+                    // 位置分组结构（对抗路、打野等）
+                    result[currentKey] = [];
+                    currentArray = result[currentKey];
+                }
+            } else if (line.startsWith('- name:') || line.startsWith('-name:')) {
+                // 新的数组项（标准heroes结构）
+                currentObject = {};
+                if (currentArray) {
+                    currentArray.push(currentObject);
+                }
+                const name = line.replace(/^-\s*name:\s*/, '');
+                currentObject.name = name;
+            } else if (line.startsWith('- ') && currentArray) {
+                // 简单的列表项（位置分组结构）
+                const heroName = line.replace(/^-\s*/, '').trim();
+                if (heroName) {
+                    currentArray.push(heroName);
+                }
+            } else if (line.includes(':') && currentObject) {
+                // 对象属性
+                const [key, ...valueParts] = line.split(':');
+                const value = valueParts.join(':').trim();
+                if (key.trim() !== 'name') {
+                    currentObject[key.trim()] = value;
+                }
+            }
+        }
+
+        // 如果解析出的是位置分组结构，转换为heroes数组格式
+        if (!result.heroes && Object.keys(result).length > 0) {
+            result.heroes = [];
+            for (const [position, heroList] of Object.entries(result)) {
+                if (Array.isArray(heroList)) {
+                    heroList.forEach(heroName => {
+                        if (typeof heroName === 'string' && heroName.trim()) {
+                            result.heroes.push({
+                                name: heroName,
+                                type: position,
+                                skill: '',
+                                description: ''
+                            });
+                        }
+                    });
+                }
+            }
+        }
+
+        return result;
+    }
+
+    function saveFormChanges() {
+        // 从表单收集数据
+        const form = document.getElementById('configForm');
+        const formData = new FormData(form);
+
+        // 重构配置数据
+        if (currentConfigType === 'hero') {
+            configData.heroes = [];
+            const heroCount = Math.max(...Array.from(formData.keys())
+                .filter(key => key.startsWith('heroes['))
+                .map(key => parseInt(key.match(/\[(\d+)\]/)[1])) || [-1]) + 1;
+
+            for (let i = 0; i < heroCount; i++) {
+                const hero = {
+                    name: formData.get(`heroes[${i}].name`) || '',
+                    type: formData.get(`heroes[${i}].type`) || '',
+                    skill: formData.get(`heroes[${i}].skill`) || '',
+                    description: formData.get(`heroes[${i}].description`) || ''
+                };
+                configData.heroes.push(hero);
+            }
+        }
+
+        // 转换为YAML格式
+        const newYamlContent = generateYamlFromConfig(configData);
+
+        // 更新YAML编辑器内容
+        document.getElementById('yamlContent').textContent = newYamlContent;
+        document.getElementById('yamlEditor').value = newYamlContent;
+        originalYamlContent = newYamlContent;
+
+        // 调用保存API
         let editApiUrl = '';
         if (currentConfigType === 'hero') {
             editApiUrl = API_BASE_URL + '/gagaFamily/conf/heroEdit';
@@ -518,26 +1239,129 @@
             headers: {
                 'Content-Type': 'text/plain'
             },
+            body: newYamlContent
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('保存失败，状态码：' + response.status);
+                }
+                return response.text();
+            })
+            .then(data => {
+                setEditMode(false);
+                alert('保存成功：' + data);
+            })
+            .catch(error => {
+                alert('保存失败：' + error.message);
+            })
+            .finally(() => {
+                // 恢复按钮状态
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            });
+    }
+
+    function generateYamlFromConfig(config) {
+        if (currentConfigType === 'hero' && config.heroes) {
+            // 按位置分组英雄
+            const positionGroups = {};
+            config.heroes.forEach(hero => {
+                if (!hero.name.trim()) return; // 跳过空名称的英雄
+
+                const position = hero.type || '未分类';
+                if (!positionGroups[position]) {
+                    positionGroups[position] = [];
+                }
+                positionGroups[position].push(hero.name);
+            });
+
+            // 生成位置分组的YAML格式
+            let yaml = '';
+            for (const [position, heroList] of Object.entries(positionGroups)) {
+                if (heroList.length > 0) {
+                    yaml += `${position}:\n`;
+                    heroList.forEach(heroName => {
+                        yaml += `  - ${heroName}\n`;
+                    });
+                }
+            }
+            return yaml;
+        }
+        return originalYamlContent; // 回退到原始内容
+    }
+
+    function cancelEdit() {
+        // 取消编辑，恢复原始内容
+        document.getElementById('yamlEditor').value = originalYamlContent;
+        try {
+            configData = parseSimpleYaml(originalYamlContent);
+        } catch (error) {
+            console.error('YAML解析错误:', error);
+        }
+        setEditMode(false);
+    }
+
+    function saveChanges() {
+        // YAML编辑模式的保存
+        const newContent = document.getElementById('yamlEditor').value;
+
+        // 简单验证
+        if (!newContent.trim()) {
+            alert('内容不能为空');
+            return;
+        }
+
+        document.getElementById('yamlContent').textContent = newContent;
+        originalYamlContent = newContent;
+
+        // 根据配置类型选择对应的编辑API端点
+        let editApiUrl = '';
+        if (currentConfigType === 'hero') {
+            editApiUrl = API_BASE_URL + '/gagaFamily/conf/heroEdit';
+        } else if (currentConfigType === 'user') {
+            editApiUrl = API_BASE_URL + '/gagaFamily/conf/userEdit';
+        } else {
+            alert('无法确定配置类型');
+            return;
+        }
+
+        // 显示保存中状态
+        const saveBtn = document.querySelector('#yamlEditContainer .save-btn');
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = '保存中...';
+        saveBtn.disabled = true;
+
+        fetch(editApiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
             body: newContent
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('保存失败，状态码：' + response.status);
-            }
-            return response.text();
-        })
-        .then(data => {
-            setEditMode(false);
-            alert('保存成功：' + data);
-        })
-        .catch(error => {
-            alert('保存失败：' + error.message);
-        })
-        .finally(() => {
-            // 恢复按钮状态
-            saveBtn.textContent = originalText;
-            saveBtn.disabled = false;
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('保存失败，状态码：' + response.status);
+                }
+                return response.text();
+            })
+            .then(data => {
+                // 更新解析的数据
+                try {
+                    configData = parseSimpleYaml(newContent);
+                } catch (error) {
+                    console.error('YAML解析错误:', error);
+                }
+                setEditMode(false);
+                alert('保存成功：' + data);
+            })
+            .catch(error => {
+                alert('保存失败：' + error.message);
+            })
+            .finally(() => {
+                // 恢复按钮状态
+                saveBtn.textContent = originalText;
+                saveBtn.disabled = false;
+            });
     }
 
     // 点击弹窗外部区域关闭弹窗
