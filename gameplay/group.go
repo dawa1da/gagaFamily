@@ -7,9 +7,13 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/patrickmn/go-cache"
 	"gopkg.in/yaml.v3"
 )
+
+var c = cache.New(10*time.Second, 0)
 
 type Group struct {
 	Users []*UserInfo `yaml:"users"`
@@ -47,6 +51,7 @@ func GetGroupHandler(w http.ResponseWriter, r *http.Request) {
 		group.Users[i], group.Users[j] = group.Users[j], group.Users[i]
 	})
 
+	_, _ = fmt.Fprintf(w, fmt.Sprintf("----------------------------------\n"))
 	for i, user := range group.Users {
 		group.Users[i].Position = positions[i]
 		userHeroPool := make([]string, len(hero.Positions[positions[i]]))
@@ -76,9 +81,23 @@ func GetGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 		_, _ = fmt.Fprintf(w, fmt.Sprintf("[%s]玩家为[%s]随机英雄为[%s]\n", user.Position, user.Name, getRandomString(userHeroPool)))
 		if i == 4 {
-			_, _ = fmt.Fprintf(w, fmt.Sprintf("\n"))
+			_, _ = fmt.Fprintf(w, fmt.Sprintf("----------------------------------\n"))
 		}
 	}
+	_, _ = fmt.Fprintf(w, fmt.Sprintf("----------------------------------\n"))
+
+	ip := strings.Split(r.RemoteAddr, ":")[0]
+	c.Set(fmt.Sprintf("%s-%s", ip, generateCaptcha()), struct{}{}, cache.DefaultExpiration)
+
+	count := 0
+	for k := range c.Items() {
+		if strings.Contains(k, ip) {
+			count++
+		}
+	}
+
+	_, _ = fmt.Fprintf(w, fmt.Sprintf("[%s]10秒内请求分组次数为%d\n", ip, count))
+
 }
 
 func contains(arr []string, target string) bool {
@@ -106,4 +125,13 @@ func removeString(input []string, target string) []string {
 		}
 	}
 	return result
+}
+
+func generateCaptcha() string {
+	digits := "ABCDEFGHIJKLMNOPQRSTUVWXYZ23456789"
+	captcha := ""
+	for i := 0; i < 6; i++ {
+		captcha += string(digits[rand.Intn(len(digits))])
+	}
+	return captcha
 }
