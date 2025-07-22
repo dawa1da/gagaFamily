@@ -1,9 +1,18 @@
 users:
   - name: "方"
-    banList: ["兰陵王"]
-    weightList: [ ]
+    banList: [
+      "阿骨朵",
+      "赵云",
+      "韩信"
+    ]
+    weightList: [
+      "瑶*10000",
+      "少司源*1"
+    ]
   - name: "季"
-    banList: [ ]
+    banList: [
+      "牛魔"
+    ]
     weightList: [ ]
   - name: "来姐"
     banList: [ ]
@@ -12,14 +21,19 @@ users:
     banList: [ ]
     weightList: [ ]
   - name: "逍遥"
-    banList: [ ]
+    banList: [
+      "海诺",
+      "芈月"
+    ]
     weightList: [ ]
   - name: "lup"
-    banList: [ ]
+    banList: [
+      "阿骨朵"
+    ]
     weightList: [ ]
   - name: "柯镇恶"
     banList: [ ]
-    weightList: ["瑶*10000"]
+    weightList: [ ]
   - name: "小何"
     banList: [ ]
     weightList: [ ]

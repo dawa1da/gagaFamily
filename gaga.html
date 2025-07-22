@@ -260,6 +260,46 @@
             background-color: #c82333;
         }
 
+        /* 列表容器样式 */
+        .list-container {
+            margin-top: 10px;
+        }
+
+        .list-items {
+            margin-bottom: 10px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .list-item input[type="text"] {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        .list-item input[type="text"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        .list-item .remove-item-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            margin-left: 0;
+        }
+
         .hero-item {
             border: 1px solid #dee2e6;
             border-radius: 6px;
@@ -665,12 +705,12 @@
 
 <script>
     // 全局配置变量
-    const API_BASE_URL = 'http://10.10.129.108:8008';
+    const API_BASE_URL = 'http://127.0.0.1:8008';
 
     // 应用状态变量
     let originalYamlContent = '';
     let currentEditMode = false;
-    let currentViewMode = 'yaml'; // 'yaml' 或 'form'
+    let currentViewMode = 'form'; // 'yaml' 或 'form'
     let currentConfigType = '';
     let configData = {};
 
@@ -720,7 +760,7 @@
 
         document.getElementById('yamlModal').style.display = 'block';
         setEditMode(false);
-        setViewMode('yaml');
+        setViewMode('form');
 
         // 阻止页面滚动
         document.body.style.overflow = 'hidden';
@@ -959,7 +999,7 @@
                 nameInput.dataset.position = position;
                 nameInput.dataset.originalName = hero.name;
                 nameInput.className = 'hero-name-input';
-                nameInput.name = `heroName-${position}-${hero.name}`; 
+                nameInput.name = `heroName-${position}-${hero.name}`;
                 nameInput.addEventListener('change', function() {
                     updateHeroName(hero.name, this.value, position);
                     this.dataset.originalName = this.value;
@@ -981,51 +1021,10 @@
         });
     }
 
-    function addHeroItem() {
-        const heroList = document.getElementById('heroEditList');
-        const newHero = { name: '', type: '', skill: '', description: '' };
-        configData.heroes.push(newHero);
-        addHeroEditItem(heroList, newHero, configData.heroes.length - 1);
-    }
-
-    function addHeroEditItem(container, hero, index) {
-        const heroDiv = document.createElement('div');
-        heroDiv.className = 'hero-item';
-        heroDiv.innerHTML = `
-            <div class="hero-item-header">
-                <div class="hero-item-title">英雄 #${index + 1}</div>
-                <button type="button" class="remove-item-btn" onclick="removeHeroItem(${index})">删除</button>
-            </div>
-            <div class="form-group">
-                <label>名称:</label>
-                <input type="text" name="heroes[${index}].name" value="${hero.name || ''}" placeholder="输入英雄名称">
-            </div>
-            <div class="form-group">
-                <label>类型:</label>
-                <select name="heroes[${index}].type">
-                    <option value="">选择位置</option>
-                    <option value="对抗路" ${hero.type === '对抗路' ? 'selected' : ''}>对抗路</option>
-                    <option value="打野" ${hero.type === '打野' ? 'selected' : ''}>打野</option>
-                    <option value="中路" ${hero.type === '中路' ? 'selected' : ''}>中路</option>
-                    <option value="发育路" ${hero.type === '发育路' ? 'selected' : ''}>发育路</option>
-                    <option value="游走" ${hero.type === '游走' ? 'selected' : ''}>游走</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>技能:</label>
-                <input type="text" name="heroes[${index}].skill" value="${hero.skill || ''}" placeholder="输入技能名称">
-            </div>
-            <div class="form-group">
-                <label>描述:</label>
-                <textarea name="heroes[${index}].description" placeholder="输入英雄描述">${hero.description || ''}</textarea>
-            </div>
-        `;
-        container.appendChild(heroDiv);
-    }
-
     function removeHeroItem(index) {
         configData.heroes.splice(index, 1);
-        generateFormEdit(); // 重新生成表单
+        // 不再重新生成整个表单，而是让调用者处理DOM更新
+        // generateFormEdit(); // 重新生成表单
     }
 
     function addHeroToPosition(position) {
@@ -1087,7 +1086,7 @@
         if (!heroName) return;
 
         // 查找并移除英雄
-        const index = configData.heroes.findIndex(hero => 
+        const index = configData.heroes.findIndex(hero =>
             hero.name === heroName && hero.type === position);
 
         if (index !== -1) {
@@ -1099,7 +1098,7 @@
         if (!newName) return;
 
         // 查找并更新英雄名称
-        const hero = configData.heroes.find(hero => 
+        const hero = configData.heroes.find(hero =>
             hero.name === oldName && hero.type === position);
 
         if (hero) {
@@ -1109,64 +1108,358 @@
 
     function generateUserFormView(container) {
         // 用户配置的表单视图生成逻辑
-        container.innerHTML = '<p>用户配置表单视图（待实现）</p>';
+        if (!configData.users || !Array.isArray(configData.users)) {
+            container.innerHTML = '<p>没有找到用户数据</p>';
+            return;
+        }
+
+        let html = '<div class="form-section">';
+        html += '<div class="form-section-header">';
+        html += '<span>用户配置</span>';
+        html += '<span>共 ' + configData.users.length + ' 个用户</span>';
+        html += '</div>';
+        html += '<div class="form-section-content">';
+
+        configData.users.forEach((user, index) => {
+            html += '<div class="hero-item">';
+            html += '<div class="hero-item-header">';
+            html += '<div class="hero-item-title">用户: ' + (user.name || '未命名') + '</div>';
+            html += '</div>';
+
+            html += '<div class="form-group">';
+            html += '<label>用户名:</label>';
+            html += '<span>' + (user.name || '未设置') + '</span>';
+            html += '</div>';
+
+            html += '<div class="form-group">';
+            html += '<label>禁用英雄:</label>';
+            html += '<span>' + (user.banList && user.banList.length > 0 ? user.banList.join(', ') : '无') + '</span>';
+            html += '</div>';
+
+            html += '<div class="form-group">';
+            html += '<label>权重英雄:</label>';
+            html += '<span>' + (user.weightList && user.weightList.length > 0 ? user.weightList.join(', ') : '无') + '</span>';
+            html += '</div>';
+
+            html += '</div>';
+        });
+
+        html += '</div>';
+        html += '</div>';
+
+        container.innerHTML = html;
     }
 
     function generateUserFormEdit(container) {
         // 用户配置的表单编辑逻辑
-        container.innerHTML = '<p>用户配置表单编辑（待实现）</p>';
+        if (!configData.users || !Array.isArray(configData.users)) {
+            configData.users = [];
+        }
+
+        let html = '<div class="form-section">';
+        html += '<div class="form-section-header">';
+        html += '<span>用户配置编辑</span>';
+        html += '<button type="button" class="add-item-btn" onclick="addNewUser()">添加用户</button>';
+        html += '</div>';
+        html += '<div class="form-section-content" id="usersContainer">';
+
+        configData.users.forEach((user, index) => {
+            html += generateUserEditItem(user, index);
+        });
+
+        html += '</div>';
+        html += '</div>';
+
+        container.innerHTML = html;
+    }
+
+    function generateUserEditItem(user, index) {
+        let html = '<div class="hero-item" data-user-index="' + index + '">';
+        html += '<div class="hero-item-header">';
+        html += '<div class="hero-item-title">用户 ' + (index + 1) + '</div>';
+        html += '<button type="button" class="remove-item-btn" onclick="removeUser(' + index + ')">删除用户</button>';
+        html += '</div>';
+
+        // 用户名输入
+        html += '<div class="form-group">';
+        html += '<label>用户名:</label>';
+        html += '<input type="text" class="user-name-input" data-user-index="' + index + '" value="' + (user.name || '') + '" placeholder="输入用户名">';
+        html += '</div>';
+
+        // 禁用英雄列表
+        html += '<div class="form-group">';
+        html += '<label>禁用英雄:</label>';
+        html += '<div class="list-container">';
+        html += '<div class="list-items" id="banList-' + index + '">';
+        if (user.banList && user.banList.length > 0) {
+            user.banList.forEach((hero, heroIndex) => {
+                html += '<div class="list-item">';
+                html += '<input type="text" value="' + hero + '" data-list-type="banList" data-user-index="' + index + '" data-item-index="' + heroIndex + '">';
+                html += '<button type="button" class="remove-item-btn" onclick="removeListItem(\'banList\', ' + index + ', ' + heroIndex + ')">删除</button>';
+                html += '</div>';
+            });
+        }
+        html += '</div>';
+        html += '<button type="button" class="add-item-btn" onclick="addListItem(\'banList\', ' + index + ')">添加禁用英雄</button>';
+        html += '</div>';
+        html += '</div>';
+
+        // 权重英雄列表
+        html += '<div class="form-group">';
+        html += '<label>权重英雄:</label>';
+        html += '<div class="list-container">';
+        html += '<div class="list-items" id="weightList-' + index + '">';
+        if (user.weightList && user.weightList.length > 0) {
+            user.weightList.forEach((hero, heroIndex) => {
+                html += '<div class="list-item">';
+                html += '<input type="text" value="' + hero + '" data-list-type="weightList" data-user-index="' + index + '" data-item-index="' + heroIndex + '" placeholder="例: 瑶*10000">';
+                html += '<button type="button" class="remove-item-btn" onclick="removeListItem(\'weightList\', ' + index + ', ' + heroIndex + ')">删除</button>';
+                html += '</div>';
+            });
+        }
+        html += '</div>';
+        html += '<button type="button" class="add-item-btn" onclick="addListItem(\'weightList\', ' + index + ')">添加权重英雄</button>';
+        html += '</div>';
+        html += '</div>';
+
+        html += '</div>';
+        return html;
+    }
+
+    function addNewUser() {
+        if (!configData.users) {
+            configData.users = [];
+        }
+
+        const newUser = {
+            name: "",
+            banList: [],
+            weightList: []
+        };
+
+        configData.users.push(newUser);
+
+        // 不再重新生成整个表单，而是直接添加新用户项到DOM
+        const usersContainer = document.getElementById('usersContainer');
+        const userIndex = configData.users.length - 1;
+        const userHtml = generateUserEditItem(newUser, userIndex);
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = userHtml;
+        const userElement = tempDiv.firstChild;
+        usersContainer.appendChild(userElement);
+
+        // 聚焦到新用户的名称输入框
+        const nameInput = userElement.querySelector('.user-name-input');
+        if (nameInput) {
+            nameInput.focus();
+        }
+    }
+
+    function removeUser(userIndex) {
+        if (confirm('确定要删除这个用户吗？')) {
+            configData.users.splice(userIndex, 1);
+
+            // 不再重新生成整个表单，而是直接移除用户元素
+            const userElement = document.querySelector(`[data-user-index="${userIndex}"]`);
+            if (userElement) {
+                userElement.remove();
+            }
+
+            // 更新剩余用户元素的索引
+            const remainingUsers = document.querySelectorAll('[data-user-index]');
+            remainingUsers.forEach((element, index) => {
+                const currentIndex = parseInt(element.getAttribute('data-user-index'));
+                if (currentIndex > userIndex) {
+                    element.setAttribute('data-user-index', currentIndex - 1);
+                    // 更新所有相关的索引引用
+                    const inputs = element.querySelectorAll('[data-user-index]');
+                    inputs.forEach(input => {
+                        input.setAttribute('data-user-index', currentIndex - 1);
+                    });
+                    // 更新按钮的onclick属性
+                    const removeBtn = element.querySelector('.remove-item-btn');
+                    if (removeBtn) {
+                        removeBtn.setAttribute('onclick', `removeUser(${currentIndex - 1})`);
+                    }
+                }
+            });
+        }
+    }
+
+    function addListItem(listType, userIndex) {
+        if (!configData.users[userIndex][listType]) {
+            configData.users[userIndex][listType] = [];
+        }
+
+        configData.users[userIndex][listType].push('');
+
+        // 不再重新生成整个表单，而是直接添加新项到DOM
+        const listContainer = document.getElementById(`${listType}-${userIndex}`);
+        if (listContainer) {
+            const itemIndex = configData.users[userIndex][listType].length - 1;
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'list-item';
+            itemDiv.innerHTML = `
+                <input type="text" value="" data-list-type="${listType}" data-user-index="${userIndex}" data-item-index="${itemIndex}" placeholder="${listType === 'banList' ? '例: 瑶' : '例: 瑶*10000'}">
+                <button type="button" class="remove-item-btn" onclick="removeListItem('${listType}', ${userIndex}, ${itemIndex})">删除</button>
+            `;
+            listContainer.appendChild(itemDiv);
+
+            // 聚焦到新创建的输入框
+            const newInput = itemDiv.querySelector('input');
+            if (newInput) {
+                newInput.focus();
+            }
+        }
+    }
+
+    function removeListItem(listType, userIndex, itemIndex) {
+        configData.users[userIndex][listType].splice(itemIndex, 1);
+
+        // 不再重新生成整个表单，而是直接移除项目元素
+        const listContainer = document.getElementById(`${listType}-${userIndex}`);
+        if (listContainer) {
+            const items = listContainer.querySelectorAll('.list-item');
+            if (items[itemIndex]) {
+                items[itemIndex].remove();
+            }
+
+            // 更新剩余项目的索引
+            const remainingItems = listContainer.querySelectorAll('.list-item');
+            remainingItems.forEach((item, index) => {
+                const input = item.querySelector('input');
+                const button = item.querySelector('button');
+                if (input) {
+                    input.setAttribute('data-item-index', index);
+                }
+                if (button) {
+                    button.setAttribute('onclick', `removeListItem('${listType}', ${userIndex}, ${index})`);
+                }
+            });
+        }
     }
 
     function parseSimpleYaml(yamlText) {
-        // 简单的YAML解析器，支持位置分组结构
+        // 简单的YAML解析器，支持位置分组结构和用户结构
         const lines = yamlText.split('\n');
         const result = {};
         let currentArray = null;
         let currentObject = null;
         let currentKey = null;
+        let currentSubArray = null;
+        let currentSubKey = null;
+        let inMultiLineArray = false;
+        let multiLineArrayKey = null;
 
         for (let line of lines) {
             line = line.trim();
             if (!line || line.startsWith('#')) continue;
 
+            // 处理多行数组结束
+            if (inMultiLineArray && line === ']') {
+                inMultiLineArray = false;
+                multiLineArrayKey = null;
+                continue;
+            }
+
+            // 处理多行数组中的项目
+            if (inMultiLineArray) {
+                // 处理带引号的项目，可能有尾随逗号
+                if (line.startsWith('"') && (line.endsWith('"') || line.endsWith('",') || line.endsWith('",'))) {
+                    const item = line.replace(/^"|"$|",$|",$/g, '');
+                    if (currentObject && multiLineArrayKey && currentObject[multiLineArrayKey] && item.trim()) {
+                        currentObject[multiLineArrayKey].push(item);
+                    }
+                    continue;
+                }
+                // 处理不带引号的项目，可能有尾随逗号
+                else if (!line.includes('[') && !line.includes(']') && line.trim() && !line.endsWith(':')) {
+                    const item = line.replace(/,$/, '').trim();
+                    if (currentObject && multiLineArrayKey && currentObject[multiLineArrayKey] && item) {
+                        currentObject[multiLineArrayKey].push(item);
+                    }
+                    continue;
+                }
+            }
+
             if (line.endsWith(':')) {
                 // 数组或对象开始
                 currentKey = line.slice(0, -1).trim();
-                if (currentKey === 'heroes') {
-                    // 标准heroes结构
+                if (currentKey === 'heroes' || currentKey === 'users') {
+                    // 标准heroes或users结构
                     result[currentKey] = [];
                     currentArray = result[currentKey];
+                    currentSubArray = null;
+                    currentSubKey = null;
+                } else if (currentObject && (currentKey === 'banList' || currentKey === 'weightList')) {
+                    // 用户的banList或weightList
+                    currentObject[currentKey] = [];
+                    currentSubArray = currentObject[currentKey];
+                    currentSubKey = currentKey;
                 } else {
                     // 位置分组结构（对抗路、打野等）
                     result[currentKey] = [];
                     currentArray = result[currentKey];
+                    currentSubArray = null;
+                    currentSubKey = null;
                 }
             } else if (line.startsWith('- name:') || line.startsWith('-name:')) {
-                // 新的数组项（标准heroes结构）
+                // 新的数组项（标准heroes或users结构）
                 currentObject = {};
                 if (currentArray) {
                     currentArray.push(currentObject);
                 }
-                const name = line.replace(/^-\s*name:\s*/, '');
+                const name = line.replace(/^-\s*name:\s*/, '').replace(/"/g, '');
                 currentObject.name = name;
-            } else if (line.startsWith('- ') && currentArray) {
-                // 简单的列表项（位置分组结构）
-                const heroName = line.replace(/^-\s*/, '').trim();
-                if (heroName) {
-                    currentArray.push(heroName);
+                currentSubArray = null;
+                currentSubKey = null;
+            } else if (line.startsWith('- ')) {
+                // 列表项
+                const itemValue = line.replace(/^-\s*/, '').trim().replace(/"/g, '');
+                if (currentSubArray) {
+                    // 子数组项（banList或weightList）
+                    if (itemValue) {
+                        currentSubArray.push(itemValue);
+                    }
+                } else if (currentArray) {
+                    // 简单的列表项（位置分组结构）
+                    if (itemValue) {
+                        currentArray.push(itemValue);
+                    }
                 }
             } else if (line.includes(':') && currentObject) {
                 // 对象属性
                 const [key, ...valueParts] = line.split(':');
                 const value = valueParts.join(':').trim();
-                if (key.trim() !== 'name') {
-                    currentObject[key.trim()] = value;
+                const keyName = key.trim();
+
+                if (keyName === 'banList' || keyName === 'weightList') {
+                    // 处理内联数组格式，如 banList: [ ] 或 banList: ["item1", "item2"]
+                    currentObject[keyName] = [];
+                    if (value.includes('[') && value.includes(']')) {
+                        // 单行内联数组格式
+                        const arrayContent = value.substring(value.indexOf('[') + 1, value.lastIndexOf(']')).trim();
+                        if (arrayContent) {
+                            // 分割数组项并清理引号
+                            const items = arrayContent.split(',').map(item => 
+                                item.trim().replace(/^["']|["']$/g, '')
+                            ).filter(item => item.length > 0);
+                            currentObject[keyName] = items;
+                        }
+                    } else if (value.trim() === '[') {
+                        // 多行数组开始
+                        inMultiLineArray = true;
+                        multiLineArrayKey = keyName;
+                    }
+                } else if (keyName !== 'name') {
+                    currentObject[keyName] = value.replace(/"/g, '');
                 }
             }
         }
 
         // 如果解析出的是位置分组结构，转换为heroes数组格式
-        if (!result.heroes && Object.keys(result).length > 0) {
+        if (!result.heroes && !result.users && Object.keys(result).length > 0) {
             result.heroes = [];
             for (const [position, heroList] of Object.entries(result)) {
                 if (Array.isArray(heroList)) {
@@ -1189,19 +1482,55 @@
 
     function saveFormChanges() {
         // 从表单收集数据
-        const form = document.getElementById('configForm');
-        const formData = new FormData(form);
-        const heroInputs = document.querySelectorAll('.hero-name-input');
-        const heroes = [];
+        if (currentConfigType === 'user') {
+            // 收集用户表单数据
+            const userInputs = document.querySelectorAll('.user-name-input');
+            const users = [];
 
-        heroInputs.forEach(input => {
-            const name = input.value.trim();
-            const position = input.dataset.position;
-            if (name && position) {
-                heroes.push({ name, type: position });
-            }
-        });
-        configData.heroes = heroes;
+            userInputs.forEach(input => {
+                const userIndex = parseInt(input.dataset.userIndex);
+                const name = input.value.trim();
+
+                if (name) {
+                    const user = { name: name, banList: [], weightList: [] };
+
+                    // 收集banList
+                    const banInputs = document.querySelectorAll(`input[data-list-type="banList"][data-user-index="${userIndex}"]`);
+                    banInputs.forEach(banInput => {
+                        const banHero = banInput.value.trim();
+                        if (banHero) {
+                            user.banList.push(banHero);
+                        }
+                    });
+
+                    // 收集weightList
+                    const weightInputs = document.querySelectorAll(`input[data-list-type="weightList"][data-user-index="${userIndex}"]`);
+                    weightInputs.forEach(weightInput => {
+                        const weightHero = weightInput.value.trim();
+                        if (weightHero) {
+                            user.weightList.push(weightHero);
+                        }
+                    });
+
+                    users.push(user);
+                }
+            });
+
+            configData.users = users;
+        } else {
+            // 收集英雄表单数据
+            const heroInputs = document.querySelectorAll('.hero-name-input');
+            const heroes = [];
+
+            heroInputs.forEach(input => {
+                const name = input.value.trim();
+                const position = input.dataset.position;
+                if (name && position) {
+                    heroes.push({ name, type: position });
+                }
+            });
+            configData.heroes = heroes;
+        }
 
         // 转换为YAML格式
         const newYamlContent = generateYamlFromConfig(configData);
@@ -1279,6 +1608,51 @@
                     });
                 }
             }
+            return yaml;
+        } else if (currentConfigType === 'user' && config.users) {
+            // 生成用户配置的YAML格式
+            let yaml = 'users:\n';
+            config.users.forEach(user => {
+                if (!user.name.trim()) return; // 跳过空名称的用户
+
+                yaml += `  - name: "${user.name}"\n`;
+
+                // 生成banList
+                yaml += '    banList: ';
+                if (user.banList && user.banList.length > 0) {
+                    yaml += '[\n';
+                    user.banList.forEach((hero, index) => {
+                        if (hero.trim()) {
+                            yaml += `      "${hero}"`;
+                            if (index < user.banList.length - 1) {
+                                yaml += ',';
+                            }
+                            yaml += '\n';
+                        }
+                    });
+                    yaml += '    ]\n';
+                } else {
+                    yaml += '[ ]\n';
+                }
+
+                // 生成weightList
+                yaml += '    weightList: ';
+                if (user.weightList && user.weightList.length > 0) {
+                    yaml += '[\n';
+                    user.weightList.forEach((hero, index) => {
+                        if (hero.trim()) {
+                            yaml += `      "${hero}"`;
+                            if (index < user.weightList.length - 1) {
+                                yaml += ',';
+                            }
+                            yaml += '\n';
+                        }
+                    });
+                    yaml += '    ]\n';
+                } else {
+                    yaml += '[ ]\n';
+                }
+            });
             return yaml;
         }
         return originalYamlContent; // 回退到原始内容
