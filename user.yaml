@@ -1,18 +1,16 @@
 users:
   - name: "方"
     banList: [
-      "阿骨朵",
-      "赵云",
-      "韩信"
+      "兰陵王"
     ]
     weightList: [
-      "瑶*10000",
-      "少司源*1"
+      "瑶*99",
+      "戈娅*101",
+      "成吉思汗*99",
+      "成吉思汗*1"
     ]
   - name: "季"
-    banList: [
-      "牛魔"
-    ]
+    banList: [ ]
     weightList: [ ]
   - name: "来姐"
     banList: [ ]
@@ -21,15 +19,10 @@ users:
     banList: [ ]
     weightList: [ ]
   - name: "逍遥"
-    banList: [
-      "海诺",
-      "芈月"
-    ]
+    banList: [ ]
     weightList: [ ]
   - name: "lup"
-    banList: [
-      "阿骨朵"
-    ]
+    banList: [ ]
     weightList: [ ]
   - name: "柯镇恶"
     banList: [ ]
