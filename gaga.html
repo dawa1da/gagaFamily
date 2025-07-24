@@ -2335,7 +2335,8 @@
                             if (isNaN(n) || n < 1) n = 1;
                             if (n > 1000) n = 1000;
                             user.weightList.push(`${hero}*${n}`);
-                    const user = { name: name, banList: [], weightList: [] };
+                        }
+                    }
 
                     // 收集banList
                     const banInputs = document.querySelectorAll(`input[data-list-type="banList"][data-user-index="${userIndex}"]`);
@@ -2357,6 +2358,7 @@
 
                     users.push(user);
                 }
+            
             });
 
             configData.users = users;
