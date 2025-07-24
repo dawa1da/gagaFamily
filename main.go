@@ -24,6 +24,9 @@ func main() {
 
 	//分组系统
 	http.HandleFunc("/gagaFamily/group/getGroup", gameplay.GetGroupHandler)
+	//卧底系统
+	http.HandleFunc("/gagaFamily/undercover/get", gameplay.GetUndercoverHandler)
+	http.HandleFunc("/gagaFamily/undercover/reset", gameplay.ResetUndercoverHandler)
 
 	fmt.Println("Starting server on :8008")
 	_ = http.ListenAndServe(":8008", nil)
