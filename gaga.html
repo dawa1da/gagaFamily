@@ -1359,7 +1359,7 @@
 
 <script>
     // 全局配置变量
-    const API_BASE_URL = 'http://106.53.193.122:8008';
+    const API_BASE_URL = 'http://127.0.0.1:8008';
 
     // 应用状态变量
     let originalYamlContent = '';
@@ -1651,18 +1651,35 @@
         tabHeader.className = 'tab-header';
         tabContainer.appendChild(tabHeader);
 
-        // 定义所有可能的位置
-        const allPositions = ['对抗路', '打野', '中路', '发育路', '游走', '未分类'];
+        // 定义标准位置
+        const standardPositions = ['对抗路', '打野', '中路', '发育路', '游走'];
 
-        // 确保所有位置都有对应的分组
-        allPositions.forEach(position => {
+        // 确保所有现有位置都有对应的分组
+        Object.keys(positionGroups).forEach(position => {
+            // 已经存在的位置分组保持不变
+        });
+
+        // 确保标准位置都有对应的分组
+        standardPositions.forEach(position => {
             if (!positionGroups[position]) {
                 positionGroups[position] = [];
             }
         });
 
         // 创建选项卡内容区域
-        const positions = allPositions.filter(pos => positionGroups.hasOwnProperty(pos));
+        const positions = [];
+        // 先添加标准位置
+        standardPositions.forEach(pos => {
+            if (positionGroups[pos] && positionGroups[pos].length > 0) {
+                positions.push(pos);
+            }
+        });
+        // 如果有非标准位置且有英雄，也添加进来
+        Object.keys(positionGroups).forEach(pos => {
+            if (!standardPositions.includes(pos) && positionGroups[pos].length > 0 && !positions.includes(pos)) {
+                positions.push(pos);
+            }
+        });
         positions.forEach((position, index) => {
             // 创建选项卡按钮
             const tabButton = document.createElement('div');
@@ -1857,6 +1874,11 @@
             html += '<span>' + (user.weightList && user.weightList.length > 0 ? user.weightList.join(', ') : '无') + '</span>';
             html += '</div>';
 
+            html += '<div class="form-group">';
+            html += '<label>玩家状态:</label>';
+            html += '<span>' + (user.disable ? '已禁用' : '启用') + '</span>';
+            html += '</div>';
+
             html += '</div>';
         });
 
@@ -1899,6 +1921,12 @@
         html += '<div class="form-group">';
         html += '<label>用户名:</label>';
         html += '<input type="text" class="user-name-input" data-user-index="' + index + '" value="' + (user.name || '') + '" placeholder="输入用户名">';
+        html += '</div>';
+        // 禁用状态
+        html += '<div class="form-group">';
+        html += '<label>玩家状态:</label>';
+        html += '<input type="checkbox" class="user-disable-input" data-user-index="' + index + '" ' + (user.disable ? 'checked' : '') + '>';
+        html += '<span style="margin-left: 8px;">禁用该用户</span>';
         html += '</div>';
         // 禁用英雄列表
         html += '<div class="form-group">';
@@ -2004,7 +2032,8 @@
         const newUser = {
             name: "",
             banList: [],
-            weightList: []
+            weightList: [],
+            disable: false
         };
 
         configData.users.push(newUser);
@@ -2231,7 +2260,12 @@
                         multiLineArrayKey = keyName;
                     }
                 } else if (keyName !== 'name') {
-                    currentObject[keyName] = value.replace(/"/g, '');
+                    let processedValue = value.replace(/"/g, '');
+                    // 处理布尔值
+                    if (keyName === 'disable') {
+                        processedValue = processedValue === 'true';
+                    }
+                    currentObject[keyName] = processedValue;
                 }
             }
         }
@@ -2266,7 +2300,11 @@
                 const userIndex = parseInt(input.dataset.userIndex);
                 const name = input.value.trim();
                 if (name) {
-                    const user = { name: name, banList: [], weightList: [] };
+                    // 获取禁用状态
+                    const disableInput = document.querySelector(`.user-disable-input[data-user-index='${userIndex}']`);
+                    const disable = disableInput ? disableInput.checked : false;
+
+                    const user = { name: name, banList: [], weightList: [], disable: disable };
                     // 只保存该用户的banList
                     const banHeroInputs = document.querySelectorAll(`select[data-list-type='banHero'][data-user-index='${userIndex}']`);
                     banHeroInputs.forEach(sel => {
@@ -2424,6 +2462,11 @@
                     yaml += '    ]\n';
                 } else {
                     yaml += '[ ]\n';
+                }
+
+                // 生成disable字段
+                if (user.disable !== undefined) {
+                    yaml += `    disable: ${user.disable}\n`;
                 }
             });
             return yaml;

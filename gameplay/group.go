@@ -23,6 +23,7 @@ type UserInfo struct {
 	Position   string   `yaml:"position"`
 	BanList    []string `yaml:"banList"`
 	WeightList []string `yaml:"weightList"`
+	Disable    bool     `yaml:"disable"`
 }
 
 type Hero struct {
@@ -38,11 +39,6 @@ func GetGroupHandler(w http.ResponseWriter, r *http.Request) {
 	hero.Positions = make(map[string][]string)
 	_ = yaml.Unmarshal(heroFileBytes, hero.Positions)
 
-	if len(group.Users) != 10 {
-		_, _ = fmt.Fprintf(w, "配置文件里用户数量不为10")
-		return
-	}
-
 	positions := []string{"对抗路", "打野", "中路", "发育路", "游走"}
 	positions = append(positions, positions...)
 
@@ -53,6 +49,10 @@ func GetGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, _ = fmt.Fprintf(w, fmt.Sprintf("----------------------------------\n"))
 	for i, user := range group.Users {
+		if user.Disable != false {
+			continue
+		}
+
 		group.Users[i].Position = positions[i]
 		userHeroPool := make([]string, len(hero.Positions[positions[i]]))
 		copy(userHeroPool, hero.Positions[positions[i]])
