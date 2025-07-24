@@ -102,6 +102,17 @@
             background: #1e7e34;
         }
 
+        /* 奖励结算按钮样式 */
+        .reward-button {
+            background: linear-gradient(90deg, #ff6b35 0%, #f7931e 100%);
+        }
+        .reward-button:hover {
+            background: linear-gradient(90deg, #f7931e 0%, #ff6b35 100%);
+        }
+        .reward-button:active {
+            background: #e55a2b;
+        }
+
         /* 弹窗样式优化 */
         .modal {
             display: none;
@@ -592,10 +603,10 @@
             box-shadow: 0 6px 24px rgba(56,211,159,0.13);
         }
         /* Tab切换动画 */
-        .tab-header {
+            .tab-header {
             border-bottom: 2px solid #e3e8ee;
-        }
-        .tab-button {
+            }
+            .tab-button {
             transition: background 0.2s, color 0.2s, border 0.2s;
         }
         .tab-button.active {
@@ -955,7 +966,7 @@
                 width: 100%;
                 margin: 4px 0 0 0;
                 padding: 8px 0;
-                font-size: 14px;
+            font-size: 14px;
                 border-radius: 8px;
             }
             .list-item .remove-item-btn {
@@ -969,7 +980,7 @@
                 width: 60px;
                 margin-left: 6px;
                 padding: 7px 0;
-                font-size: 14px;
+            font-size: 14px;
                 border-radius: 8px;
             }
             .modal-buttons button, .toggle-edit-btn, .toggle-view-btn {
@@ -1034,7 +1045,7 @@
         /* 查看模式分组更明显 */
         .form-section-content.view-compact {
             display: flex;
-            flex-direction: column;
+                flex-direction: column;
             gap: 4px;
         }
         .hero-item-simple.view-compact, .list-item.view-compact {
@@ -1046,7 +1057,7 @@
             display: flex;
             flex-direction: row;
             gap: 8px;
-            align-items: center;
+                align-items: center;
         }
         @media (max-width: 600px) {
             html, body {
@@ -1276,17 +1287,21 @@
 <!-- 顶部LOGO与标题区 -->
 <div class="header">
     <div class="logo-circle">G</div>
-    <h1>GAGA GAME</h1>
+<h1>GAGA GAME</h1>
 </div>
 <div class="button-container">
     <!-- 配置按钮行 -->
     <div class="button-row">
-        <button class="config-button" onclick="urlRequest('/gagaFamily/conf/heroYaml', true, 'hero')">英雄</button>
-        <button class="config-button" onclick="urlRequest('/gagaFamily/conf/userYaml', true, 'user')">用户</button>
+        <button class="config-button" onclick="urlRequest('/gagaFamily/conf/heroYaml', true, 'hero')">HERO</button>
+        <button class="config-button" onclick="urlRequest('/gagaFamily/conf/userYaml', true, 'user')">USER</button>
     </div>
     <!-- 分组按钮行 -->
     <div class="button-row">
         <button class="group-button" onclick="urlRequest('/gagaFamily/group/getGroup')">分组</button>
+    </div>
+    <!-- 奖励结算按钮行 -->
+    <div class="button-row">
+        <button class="reward-button" onclick="showRewardResult()">奖励结算</button>
     </div>
 </div>
 
@@ -1380,8 +1395,8 @@
                 .then(res => res.text())
                 .then(heroYaml => {
                     heroLaneMap = parseHeroYamlToLaneMap(heroYaml);
-                    fetch(apiUrl)
-                        .then(response => {
+        fetch(apiUrl)
+            .then(response => {
                             if (!response.ok) throw new Error('网络响应失败，状态码：' + response.status);
                             return response.text();
                         })
@@ -1398,15 +1413,15 @@
             fetch(apiUrl)
                 .then(response => {
                     if (!response.ok) throw new Error('网络响应失败，状态码：' + response.status);
-                    return response.text();
-                })
-                .then(data => {
-                    if (isYaml) {
-                        showYamlModal(data, configType);
-                    } else {
-                        alert(data);
-                    }
-                })
+                return response.text();
+            })
+            .then(data => {
+                if (isYaml) {
+                    showYamlModal(data, configType);
+                } else {
+                    alert(data);
+                }
+            })
                 .catch(error => alert('请求失败：' + error.message));
         }
     }
@@ -1443,8 +1458,8 @@
         document.getElementById('yamlEditor').value = yamlContent;
 
         // 更新模态框标题
-        const title = configType === 'hero' ? '英雄配置' :
-            configType === 'user' ? '用户配置' : '配置内容';
+        const title = configType === 'hero' ? 'HERO配置' :
+            configType === 'user' ? 'USER配置' : '配置内容';
         document.getElementById('modalTitle').textContent = title;
 
         document.getElementById('yamlModal').style.display = 'block';
@@ -1463,21 +1478,17 @@
 
     function setViewMode(mode) {
         currentViewMode = mode;
+
         // 隐藏所有容器
         document.getElementById('yamlViewContainer').style.display = 'none';
         document.getElementById('yamlEditContainer').style.display = 'none';
         document.getElementById('formViewContainer').style.display = 'none';
         document.getElementById('formEditContainer').style.display = 'none';
+
         // 更新按钮状态
         document.getElementById('toggleFormBtn').className = mode === 'form' ? 'toggle-edit-btn' : 'toggle-view-btn';
         document.getElementById('toggleYamlBtn').className = mode === 'yaml' ? 'toggle-edit-btn' : 'toggle-view-btn';
-        // 模式提示
-        const indicator = document.getElementById('modeIndicator');
-        if (currentEditMode) {
-            indicator.innerHTML = '<span class="mode-indicator edit"><span class="mode-icon">✏️</span> 当前为编辑模式</span>';
-        } else {
-            indicator.innerHTML = '<span class="mode-indicator view"><span class="mode-icon">🔍</span> 当前为查看模式</span>';
-        }
+
         if (currentEditMode) {
             // 编辑模式
             if (mode === 'form') {
@@ -1486,6 +1497,7 @@
             } else {
                 document.getElementById('yamlEditContainer').style.display = 'block';
             }
+            document.getElementById('modeIndicator').textContent = '编辑模式';
         } else {
             // 查看模式
             if (mode === 'form') {
@@ -1494,6 +1506,7 @@
             } else {
                 document.getElementById('yamlViewContainer').style.display = 'block';
             }
+            document.getElementById('modeIndicator').textContent = '查看模式';
         }
     }
 
@@ -1503,11 +1516,7 @@
 
     function setEditMode(editMode) {
         currentEditMode = editMode;
-        // 编辑按钮文本和icon
-        const editBtn = document.getElementById('toggleEditBtn');
-        if (editBtn) {
-            editBtn.innerHTML = editMode ? '查看 <span class="mode-icon">🔍</span>' : '编辑 <span class="mode-icon">✏️</span>';
-        }
+        document.getElementById('toggleEditBtn').textContent = editMode ? '查看' : '编辑';
         setViewMode(currentViewMode);
 
         // 只在编辑模式下插入footer
@@ -2099,7 +2108,7 @@
             itemDiv.className = 'list-item edit-compact';
             if (listType === 'banList') {
                 // 新增禁用英雄：分路下拉+英雄下拉
-                itemDiv.innerHTML = `
+            itemDiv.innerHTML = `
                     <select data-list-type="banLane" data-user-index="${userIndex}" data-item-index="${itemIndex}" onchange="updateBanHeroSelect(this)">${renderLaneOptions('')}</select>
                     <select data-list-type="banHero" data-user-index="${userIndex}" data-item-index="${itemIndex}">${renderHeroOptions('', '')}</select>
                     <button type="button" class="remove-item-btn" onclick="removeListItem('banList', ${userIndex}, ${itemIndex})" title="删除"><span class="remove-icon">🗑️</span></button>
@@ -2293,12 +2302,16 @@
     }
 
     function saveFormChanges() {
+        // 从表单收集数据
         if (currentConfigType === 'user') {
+            // 收集用户表单数据
             const userInputs = document.querySelectorAll('.user-name-input');
             const users = [];
+
             userInputs.forEach(input => {
                 const userIndex = parseInt(input.dataset.userIndex);
                 const name = input.value.trim();
+
                 if (name) {
                     // 获取禁用状态
                     const disableInput = document.querySelector(`.user-disable-input[data-user-index='${userIndex}']`);
@@ -2322,11 +2335,30 @@
                             if (isNaN(n) || n < 1) n = 1;
                             if (n > 1000) n = 1000;
                             user.weightList.push(`${hero}*${n}`);
+                    const user = { name: name, banList: [], weightList: [] };
+
+                    // 收集banList
+                    const banInputs = document.querySelectorAll(`input[data-list-type="banList"][data-user-index="${userIndex}"]`);
+                    banInputs.forEach(banInput => {
+                        const banHero = banInput.value.trim();
+                        if (banHero) {
+                            user.banList.push(banHero);
                         }
-                    }
+                    });
+
+                    // 收集weightList
+                    const weightInputs = document.querySelectorAll(`input[data-list-type="weightList"][data-user-index="${userIndex}"]`);
+                    weightInputs.forEach(weightInput => {
+                        const weightHero = weightInput.value.trim();
+                        if (weightHero) {
+                            user.weightList.push(weightHero);
+                        }
+                    });
+
                     users.push(user);
                 }
             });
+
             configData.users = users;
         } else {
             // 收集英雄表单数据
@@ -2558,6 +2590,10 @@
         if (event.target === groupResultModal) {
             closeGroupResultModal();
         }
+        // 关闭奖励结算弹窗
+        if (event.target.classList.contains('modal') && event.target.style.zIndex === '9999') {
+            closeRewardModal();
+        }
     }
 
     // 键盘快捷键支持
@@ -2565,6 +2601,7 @@
         if (event.key === 'Escape') {
             closeModal();
             closeGroupResultModal();
+            closeRewardModal();
         }
     });
 
@@ -2581,6 +2618,188 @@
         setTimeout(() => toast.classList.remove('show'), 2000);
     }
     // 在保存、删除等操作成功/失败时调用 showToast('操作成功')
+
+    // 奖励结算函数
+    function showRewardResult() {
+        // 随机选择一种奖励类型
+        const rewardTypes = [
+            {
+                icon: '🏆',
+                title: '败方评分最低',
+                desc: '发9.9红包',
+                color: '#dc3545',
+                bgGradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)'
+            },
+            {
+                icon: '🎯',
+                title: '胜方评分最低',
+                desc: '发9.9红包',
+                color: '#28a745',
+                bgGradient: 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)'
+            },
+            {
+                icon: '🏰',
+                title: '推塔最多的选手',
+                desc: '发9.9红包',
+                color: '#fd7e14',
+                bgGradient: 'linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%)'
+            },
+            {
+                icon: '⭐',
+                title: '胜方MVP',
+                desc: '发9.9红包',
+                color: '#ffc107',
+                bgGradient: 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)'
+            },
+            {
+                icon: '🛡️',
+                title: '助攻少的辅助',
+                desc: '发9.9红包',
+                color: '#6f42c1',
+                bgGradient: 'linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)'
+            },
+            {
+                icon: '⚔️',
+                title: '人头最多的选手',
+                desc: '发9.9红包',
+                color: '#e83e8c',
+                bgGradient: 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)'
+            },
+            {
+                icon: '🏹',
+                title: '输出少的射手',
+                desc: '发9.9红包',
+                color: '#17a2b8',
+                bgGradient: 'linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%)'
+            },
+            {
+                icon: '💔',
+                title: '射手死亡多一方的辅助',
+                desc: '发9.9红包',
+                color: '#dc3545',
+                bgGradient: 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)'
+            },
+            {
+                icon: '💰',
+                title: '中路经济低一方的打野',
+                desc: '发9.9红包',
+                color: '#28a745',
+                bgGradient: 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)'
+            },
+            {
+                icon: '👥',
+                title: '参团率低的对抗路',
+                desc: '发9.9红包',
+                color: '#6c757d',
+                bgGradient: 'linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)'
+            }
+        ];
+        const randomReward = rewardTypes[Math.floor(Math.random() * rewardTypes.length)];
+        
+        // 创建奖励结算弹窗
+        const rewardModal = document.createElement('div');
+        rewardModal.className = 'modal';
+        rewardModal.style.display = 'block';
+        rewardModal.style.zIndex = '9999';
+        
+        rewardModal.innerHTML = `
+            <div class="modal-content" style="
+                max-width: 450px;
+                background: ${randomReward.bgGradient};
+                border: 3px solid ${randomReward.color};
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+                animation: rewardModalSlideIn 0.5s ease-out;
+            ">
+                <div class="modal-header" style="
+                    background: transparent;
+                    border-bottom: 2px solid ${randomReward.color};
+                    padding: 20px 30px 15px;
+                ">
+                    <h2 style="
+                        color: ${randomReward.color};
+                        font-size: 1.8rem;
+                        font-weight: 700;
+                        margin: 0;
+                        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+                    ">🎁 奖励结算</h2>
+                    <span class="close" onclick="closeRewardModal()" style="
+                        color: ${randomReward.color};
+                        font-size: 2rem;
+                        font-weight: bold;
+                    ">&times;</span>
+                </div>
+                <div class="modal-body" style="padding: 30px; text-align: center;">
+                    <div class="reward-icon" style="
+                        font-size: 5rem;
+                        margin-bottom: 20px;
+                        animation: rewardIconBounce 0.8s ease-in-out;
+                    ">${randomReward.icon}</div>
+                    <h3 style="
+                        color: ${randomReward.color};
+                        font-size: 1.6rem;
+                        margin: 15px 0;
+                        font-weight: 700;
+                        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+                    ">${randomReward.title}</h3>
+                    <div class="reward-amount" style="
+                        background: rgba(255,255,255,0.9);
+                        padding: 15px 25px;
+                        border-radius: 20px;
+                        margin: 20px 0;
+                        display: inline-block;
+                        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                    ">
+                        <span style="
+                            color: #dc3545;
+                            font-size: 1.4rem;
+                            font-weight: 700;
+                        ">💰 ${randomReward.desc}</span>
+                    </div>
+                    <div class="reward-congrats" style="
+                        margin-top: 25px;
+                        padding: 15px;
+                        background: rgba(255,255,255,0.4);
+                        border-radius: 15px;
+                        font-size: 1.1rem;
+                        color: #495057;
+                        font-weight: 600;
+                    ">🎉 恭喜获得奖励！</div>
+                </div>
+            </div>
+            <style>
+                @keyframes rewardModalSlideIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-50px) scale(0.9);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
+                }
+                @keyframes rewardIconBounce {
+                    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+                    40% { transform: translateY(-15px); }
+                    60% { transform: translateY(-7px); }
+                }
+            </style>
+        `;
+        
+        document.body.appendChild(rewardModal);
+        document.body.style.overflow = 'hidden';
+        
+        // 显示Toast提示
+        showToast('🎊 奖励结算完成！');
+    }
+    
+    function closeRewardModal() {
+        const rewardModal = document.querySelector('.modal[style*="z-index: 9999"]');
+        if (rewardModal) {
+            rewardModal.remove();
+            document.body.style.overflow = 'auto';
+        }
+    }
 
     // 分组结果弹窗
     function showGroupResultModal(text) {
