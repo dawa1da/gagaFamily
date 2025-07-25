@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>奖励配置 - GAGA GAME</title>
+  <link rel="stylesheet" href="src/style.css">
+  <link rel="stylesheet" href="src/reward.css">
+  <style>
+    .config-page {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      font-family: 'Microsoft YaHei', sans-serif;
+    }
+
+    .config-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .config-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .config-header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .config-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .config-tabs {
+      display: flex;
+      background: #f8f9fa;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .config-tab {
+      flex: 1;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 600;
+      color: #6c757d;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+    }
+
+    .config-tab.active {
+      background: white;
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .config-tab:hover {
+      background: #e9ecef;
+    }
+
+    .config-content {
+      padding: 30px;
+      display: none;
+    }
+
+    .config-content.active {
+      display: block;
+    }
+
+    .reward-list {
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .reward-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid #f1f3f4;
+      transition: background-color 0.2s ease;
+    }
+
+    .reward-item:hover {
+      background-color: #f8f9fa;
+    }
+
+    .reward-item:last-child {
+      border-bottom: none;
+    }
+
+    .reward-index {
+      background: #667eea;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+
+    .reward-text {
+      flex: 1;
+      font-size: 1rem;
+      color: #495057;
+    }
+
+    .reward-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-edit, .btn-delete {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-edit {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-edit:hover {
+      background: #218838;
+    }
+
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-delete:hover {
+      background: #c82333;
+    }
+
+    .add-reward-form {
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: flex-end;
+    }
+
+    .btn-primary, .btn-secondary {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5a6fd8;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .btn-add {
+      background: #28a745;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 20px;
+    }
+
+    .btn-add:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    .back-button {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      padding: 12px 25px;
+      text-decoration: none;
+      border-radius: 25px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-button:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .stats-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .stats-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .stats-label {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6c757d;
+    }
+
+    .empty-state .icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      margin-bottom: 10px;
+      color: #495057;
+    }
+
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      z-index: 10000;
+      max-width: 80vw;
+      min-width: 200px;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .toast.error {
+      background: rgba(220, 53, 69, 0.9);
+      border-color: rgba(220, 53, 69, 0.3);
+    }
+
+    .toast.success {
+      background: rgba(40, 167, 69, 0.9);
+      border-color: rgba(40, 167, 69, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .config-container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+
+      .config-tabs {
+        flex-direction: column;
+      }
+
+      .config-content {
+        padding: 20px;
+      }
+
+      .reward-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .reward-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="config-page">
+    <div class="config-header">
+      <h1>⚙️ 奖励配置</h1>
+      <p>管理游戏奖励标题和描述，让游戏更有趣！</p>
+    </div>
+
+    <a href="reward.html" class="back-button">
+      ← 返回奖励页面
+    </a>
+
+    <div class="config-container">
+      <div class="config-tabs">
+        <div class="config-tab active" onclick="switchTab('titles')">
+          🏆 奖励标题
+        </div>
+        <div class="config-tab" onclick="switchTab('descs')">
+          💰 奖励描述
+        </div>
+      </div>
+
+      <!-- 奖励标题配置 -->
+      <div id="titles-content" class="config-content active">
+        <div class="stats-card">
+          <div class="stats-number" id="titles-count">0</div>
+          <div class="stats-label">当前奖励标题数量</div>
+        </div>
+
+        <button class="btn-add" onclick="showAddForm('title')">
+          ➕ 添加奖励标题
+        </button>
+
+        <div id="titles-list" class="reward-list">
+          <!-- 奖励标题列表将在这里动态生成 -->
+        </div>
+      </div>
+
+      <!-- 奖励描述配置 -->
+      <div id="descs-content" class="config-content">
+        <div class="stats-card">
+          <div class="stats-number" id="descs-count">0</div>
+          <div class="stats-label">当前奖励描述数量</div>
+        </div>
+
+        <button class="btn-add" onclick="showAddForm('desc')">
+          ➕ 添加奖励描述
+        </button>
+
+        <div id="descs-list" class="reward-list">
+          <!-- 奖励描述列表将在这里动态生成 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加/编辑表单模态框 -->
+  <div id="form-modal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 id="form-title">添加奖励</h2>
+        <span class="close" onclick="closeFormModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="add-reward-form">
+          <div class="form-group">
+            <label id="form-label">奖励内容</label>
+            <textarea id="form-input" placeholder="请输入奖励内容..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn-secondary" onclick="closeFormModal()">取消</button>
+            <button class="btn-primary" onclick="saveReward()">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast"></div>
+
+  <script src="src/config.js"></script>
+  <script>
+    let currentTab = 'titles';
+    let currentEditIndex = -1;
+    let currentEditType = '';
+
+    // 初始化页面
+    document.addEventListener('DOMContentLoaded', function() {
+      loadRewards();
+      updateStats();
+    });
+
+    // 切换标签页
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      // 更新标签页样式
+      document.querySelectorAll('.config-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.config-content').forEach(c => c.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(tab + '-content').classList.add('active');
+      
+      // 重新加载数据
+      loadRewards();
+      updateStats();
+    }
+
+    // 加载奖励数据
+    function loadRewards() {
+      loadTitles();
+      loadDescs();
+    }
+
+    // 加载奖励标题
+    function loadTitles() {
+      const container = document.getElementById('titles-list');
+      
+      if (rewardTitles.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">🏆</div>
+            <h3>暂无奖励标题</h3>
+            <p>点击上方按钮添加第一个奖励标题</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      rewardTitles.forEach((title, index) => {
+        html += `
+          <div class="reward-item">
+            <div class="reward-index">${index + 1}</div>
+            <div class="reward-text">${title}</div>
+            <div class="reward-actions">
+              <button class="btn-edit" onclick="editReward('title', ${index})">编辑</button>
+              <button class="btn-delete" onclick="deleteReward('title', ${index})">删除</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    // 加载奖励描述
+    function loadDescs() {
+      const container = document.getElementById('descs-list');
+      
+      if (rewardDescs.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">💰</div>
+            <h3>暂无奖励描述</h3>
+            <p>点击上方按钮添加第一个奖励描述</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      rewardDescs.forEach((desc, index) => {
+        html += `
+          <div class="reward-item">
+            <div class="reward-index">${index + 1}</div>
+            <div class="reward-text">${desc}</div>
+            <div class="reward-actions">
+              <button class="btn-edit" onclick="editReward('desc', ${index})">编辑</button>
+              <button class="btn-delete" onclick="deleteReward('desc', ${index})">删除</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    // 更新统计信息
+    function updateStats() {
+      document.getElementById('titles-count').textContent = rewardTitles.length;
+      document.getElementById('descs-count').textContent = rewardDescs.length;
+    }
+
+    // 显示添加表单
+    function showAddForm(type) {
+      currentEditType = type;
+      currentEditIndex = -1;
+      
+      const modal = document.getElementById('form-modal');
+      const title = document.getElementById('form-title');
+      const label = document.getElementById('form-label');
+      const input = document.getElementById('form-input');
+      
+      title.textContent = type === 'title' ? '添加奖励标题' : '添加奖励描述';
+      label.textContent = type === 'title' ? '奖励标题' : '奖励描述';
+      input.value = '';
+      input.placeholder = type === 'title' ? '请输入奖励标题...' : '请输入奖励描述...';
+      
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    // 编辑奖励
+    function editReward(type, index) {
+      currentEditType = type;
+      currentEditIndex = index;
+      
+      const modal = document.getElementById('form-modal');
+      const title = document.getElementById('form-title');
+      const label = document.getElementById('form-label');
+      const input = document.getElementById('form-input');
+      
+      title.textContent = type === 'title' ? '编辑奖励标题' : '编辑奖励描述';
+      label.textContent = type === 'title' ? '奖励标题' : '奖励描述';
+      
+      const data = type === 'title' ? rewardTitles : rewardDescs;
+      input.value = data[index];
+      input.placeholder = type === 'title' ? '请输入奖励标题...' : '请输入奖励描述...';
+      
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    // 保存奖励
+    function saveReward() {
+      const input = document.getElementById('form-input');
+      const value = input.value.trim();
+      
+      if (!value) {
+        showToast('请输入内容', 'error');
+        return;
+      }
+      
+      if (currentEditIndex === -1) {
+        // 添加新奖励
+        if (currentEditType === 'title') {
+          rewardTitles.push(value);
+        } else {
+          rewardDescs.push(value);
+        }
+        showToast('添加成功！');
+      } else {
+        // 编辑现有奖励
+        if (currentEditType === 'title') {
+          rewardTitles[currentEditIndex] = value;
+        } else {
+          rewardDescs[currentEditIndex] = value;
+        }
+        showToast('编辑成功！');
+      }
+      
+      closeFormModal();
+      loadRewards();
+      updateStats();
+      saveToLocalStorage();
+    }
+
+    // 删除奖励
+    function deleteReward(type, index) {
+      if (!confirm('确定要删除这个奖励吗？')) {
+        return;
+      }
+      
+      if (type === 'title') {
+        rewardTitles.splice(index, 1);
+      } else {
+        rewardDescs.splice(index, 1);
+      }
+      
+      showToast('删除成功！');
+      loadRewards();
+      updateStats();
+      saveToLocalStorage();
+    }
+
+    // 关闭表单模态框
+    function closeFormModal() {
+      const modal = document.getElementById('form-modal');
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // 保存到本地存储
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem('rewardTitles', JSON.stringify(rewardTitles));
+        localStorage.setItem('rewardDescs', JSON.stringify(rewardDescs));
+      } catch (e) {
+        console.error('保存到本地存储失败:', e);
+      }
+    }
+
+    // 从本地存储加载
+    function loadFromLocalStorage() {
+      try {
+        const savedTitles = localStorage.getItem('rewardTitles');
+        const savedDescs = localStorage.getItem('rewardDescs');
+        
+        if (savedTitles) {
+          rewardTitles.length = 0;
+          rewardTitles.push(...JSON.parse(savedTitles));
+        }
+        
+        if (savedDescs) {
+          rewardDescs.length = 0;
+          rewardDescs.push(...JSON.parse(savedDescs));
+        }
+      } catch (e) {
+        console.error('从本地存储加载失败:', e);
+      }
+    }
+
+    // Toast提示函数
+    function showToast(msg, type = 'success') {
+      let toast = document.querySelector('.toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+      }
+      
+      toast.textContent = msg;
+      toast.className = `toast ${type}`;
+      
+      // 强制重绘以确保动画效果
+      toast.offsetHeight;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+        // 动画结束后清理
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 300);
+      }, 2000);
+    }
+
+    // 点击模态框外部关闭
+    window.onclick = function(event) {
+      const modal = document.getElementById('form-modal');
+      if (event.target === modal) {
+        closeFormModal();
+      }
+    }
+
+    // 键盘快捷键支持
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeFormModal();
+      }
+    });
+
+    // 页面加载时从本地存储加载数据
+    loadFromLocalStorage();
+  </script>
+</body>
+
+</html> 
