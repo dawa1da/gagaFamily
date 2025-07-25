@@ -108,7 +108,7 @@ func GetGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func contains(arr []string, target string) bool {
+func contains[T comparable](arr []T, target T) bool {
 	for _, item := range arr {
 		if item == target {
 			return true

@@ -2,27 +2,33 @@ package gameplay
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 )
 
 var userMap sync.Map
-var undercoverNumber int8
+var undercoverQuantity int8
+var undercoverSlice []int8
 var teamNumber string
 var numberSlice []int8
 
 func InitUndercover() {
-	undercoverNumber = int8(rand.Intn(5) + 1)
 	teamNumber = generateCaptcha()
 	numberSlice = []int8{1, 2, 3, 4, 5}
-	rand.Shuffle(5, func(i, j int) { numberSlice[i], numberSlice[j] = numberSlice[j], numberSlice[i] })
+	copySlice := make([]int8, len(numberSlice))
+	copy(copySlice, numberSlice)
+	rand.Shuffle(5, func(i, j int) { copySlice[i], copySlice[j] = copySlice[j], copySlice[i] })
+	undercoverSlice = copySlice[:undercoverQuantity]
+
 }
 
 func GetUndercoverHandler(w http.ResponseWriter, r *http.Request) {
-	_, _ = fmt.Fprintf(w, fmt.Sprintf("队伍号%s\n", teamNumber))
+	_, _ = fmt.Fprintf(w, fmt.Sprintf("队伍号%s,卧底数量为%d\n", teamNumber, undercoverQuantity))
 
 	ip := strings.Split(r.RemoteAddr, ":")[0]
 
@@ -40,7 +46,7 @@ func GetUndercoverHandler(w http.ResponseWriter, r *http.Request) {
 		userMap.Store(ip, number)
 	}
 
-	if number == undercoverNumber {
+	if contains(undercoverSlice, number) {
 		_, _ = fmt.Fprintf(w, fmt.Sprintf("你的数字是[%d],你是卧底!!!", number))
 	} else {
 		_, _ = fmt.Fprintf(w, fmt.Sprintf("你的数字是[%d],你不是卧底", number))
@@ -55,6 +61,12 @@ func ResetUndercoverHandler(w http.ResponseWriter, r *http.Request) {
 		return true
 	})
 
+	body, _ := io.ReadAll(r.Body)
+	defer func() { _ = r.Body.Close() }()
+	bodyStr := strings.TrimSpace(string(body))
+	number, _ := strconv.Atoi(bodyStr)
+	undercoverQuantity = int8(number)
+
 	InitUndercover()
-	_, _ = fmt.Fprintf(w, fmt.Sprintf("队伍号重置为%s,卧底数量", teamNumber))
+	_, _ = fmt.Fprintf(w, fmt.Sprintf("队伍号重置为%s,卧底数量为%d", teamNumber, undercoverQuantity))
 }
