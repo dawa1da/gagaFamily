@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"time"
-
 	"gagaFamily/gameplay"
 )
 
@@ -15,7 +15,16 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/gagaFamily/game", htmlHandler)
+    // http.HandleFunc("/gagaFamily/game", htmlHandler)
+	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("src"))))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// 只允许访问 .html 文件
+		if strings.HasSuffix(r.URL.Path, ".html") {
+			http.ServeFile(w, r, "."+r.URL.Path)
+			return
+		}
+		http.NotFound(w, r)
+	})
 	//配置文件
 	http.HandleFunc("/gagaFamily/conf/heroYaml", gameplay.HeroYamlHandler)
 	http.HandleFunc("/gagaFamily/conf/heroEdit", gameplay.HeroEditHandler)
