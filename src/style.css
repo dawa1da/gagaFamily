@@ -57,6 +57,48 @@ button:active {
   transform: scale(0.98);
 }
 
+/* 用户内容容器样式 */
+.user-content-container {
+  max-width: 1200px;
+  margin: 30px auto;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 30px;
+  padding-bottom: 100px; /* 为底部固定按钮留出空间 */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  min-height: calc(100vh - 200px);
+}
+
+/* 固定底部按钮容器 */
+.fixed-bottom-buttons {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 15px 20px;
+  z-index: 1000;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.fixed-bottom-buttons .modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.fixed-bottom-buttons .modal-buttons button {
+  flex: 1;
+  max-width: 180px;
+}
+
 /* 配置按钮样式 */
 .config-button {
   background: linear-gradient(90deg, #007bff 0%, #38d39f 100%);
@@ -255,6 +297,10 @@ button:active {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.form-group.user-page {
+  flex-direction: row;
 }
 
 .form-group label {
@@ -556,6 +602,25 @@ button:active {
     touch-action: manipulation;
   }
 
+  .user-content-container {
+    margin: 15px auto;
+    padding: 15px;
+    padding-bottom: 80px; /* 为底部固定按钮留出空间 */
+    border-radius: 15px;
+  }
+
+  .fixed-bottom-buttons {
+    padding: 10px 15px;
+  }
+
+  .fixed-bottom-buttons .modal-buttons {
+    gap: 15px;
+  }
+
+  .fixed-bottom-buttons .modal-buttons button {
+    max-width: 150px;
+  }
+
   .modal-content {
     width: 99vw;
     margin: 1vw auto;
@@ -590,11 +655,15 @@ button:active {
   .yaml-editor {
     font-size: 12px;
     padding: 10px;
-    max-height: 220px;
   }
 
   .modal-buttons {
     flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .modal-buttons.user-page {
+    flex-direction:row;
     gap: 8px;
   }
 
@@ -633,6 +702,26 @@ button:active {
 }
 
 @media (max-width: 480px) {
+  .user-content-container {
+    margin: 10px auto;
+    padding: 10px;
+    padding-bottom: 70px;
+  }
+
+  .fixed-bottom-buttons {
+    padding: 8px 10px;
+  }
+
+  .fixed-bottom-buttons .modal-buttons {
+    gap: 10px;
+  }
+
+  .fixed-bottom-buttons .modal-buttons button {
+    max-width: 120px;
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+
   .modal-content {
     width: 100vw;
     margin: 0 auto;
@@ -1484,12 +1573,24 @@ button:active::after {
     border-radius: 7px;
   }
 
+  .fixed-bottom-buttons .modal-buttons {
+    gap: 8px;
+  }
+
+  .fixed-bottom-buttons .modal-buttons button {
+    max-width: 100px;
+    padding: 8px 0;
+    font-size: 13px;
+  }
+
   .edit-mode-toggle {
     flex-direction: column;
     gap: 5px;
   }
 
   .mode-switch {
+    display: flex;
+    flex-direction: row;
     width: 100%;
     justify-content: center;
     gap: 5px;

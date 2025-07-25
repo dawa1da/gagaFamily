@@ -5,6 +5,11 @@ let currentViewMode = 'form'; // 'yaml' 或 'form'
 let configData = {};
 let heroLaneMap = null;
 
+// 页面加载时自动加载用户配置
+document.addEventListener('DOMContentLoaded', function() {
+  loadUserConfig();
+});
+
 // 加载用户配置
 function loadUserConfig() {
   // 先加载hero.yaml获取英雄分路信息
@@ -20,7 +25,7 @@ function loadUserConfig() {
       return response.text();
     })
     .then(data => {
-      showUserModal(data);
+      showUserContent(data);
     })
     .catch(error => {
       alert('请求失败：' + error.message);
@@ -44,7 +49,7 @@ function parseHeroYamlToLaneMap(yamlText) {
   return map;
 }
 
-function showUserModal(yamlContent) {
+function showUserContent(yamlContent) {
   originalYamlContent = yamlContent;
 
   try {
@@ -58,18 +63,8 @@ function showUserModal(yamlContent) {
   document.getElementById('yamlContent').textContent = yamlContent;
   document.getElementById('yamlEditor').value = yamlContent;
 
-  document.getElementById('userModal').style.display = 'block';
   setEditMode(false);
   setViewMode('form');
-
-  // 阻止页面滚动
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-  document.getElementById('userModal').style.display = 'none';
-  // 恢复页面滚动
-  document.body.style.overflow = 'auto';
 }
 
 function setViewMode(mode) {
@@ -113,6 +108,15 @@ function toggleEditMode() {
 function setEditMode(editMode) {
   currentEditMode = editMode;
   document.getElementById('toggleEditBtn').textContent = editMode ? '查看' : '编辑';
+  
+  // 显示或隐藏底部固定按钮
+  const fixedButtons = document.getElementById('fixedBottomButtons');
+  if (editMode) {
+    fixedButtons.style.display = 'block';
+  } else {
+    fixedButtons.style.display = 'none';
+  }
+  
   setViewMode(currentViewMode);
 }
 
@@ -138,22 +142,22 @@ function generateFormView() {
     html += '<div class="hero-item-title">用户: ' + (user.name || '未命名') + '</div>';
     html += '</div>';
 
-    html += '<div class="form-group">';
+    html += '<div class="form-group user-page">';
     html += '<label>用户名:</label>';
     html += '<span>' + (user.name || '未设置') + '</span>';
     html += '</div>';
 
-    html += '<div class="form-group">';
+    html += '<div class="form-group user-page">';
     html += '<label>禁用英雄:</label>';
     html += '<span>' + (user.banList && user.banList.length > 0 ? user.banList.join(', ') : '无') + '</span>';
     html += '</div>';
 
-    html += '<div class="form-group">';
+    html += '<div class="form-group user-page">';
     html += '<label>权重英雄:</label>';
     html += '<span>' + (user.weightList && user.weightList.length > 0 ? user.weightList.join(', ') : '无') + '</span>';
     html += '</div>';
 
-    html += '<div class="form-group">';
+    html += '<div class="form-group user-page">';
     html += '<label>玩家状态:</label>';
     html += '<span>' + (user.disable ? '已禁用' : '启用') + '</span>';
     html += '</div>';
@@ -680,6 +684,15 @@ function generateYamlFromConfig(config) {
   return originalYamlContent; // 回退到原始内容
 }
 
+function handleSave() {
+  // 根据当前编辑模式调用相应的保存函数
+  if (currentViewMode === 'yaml') {
+    saveChanges();
+  } else {
+    saveFormChanges();
+  }
+}
+
 function cancelEdit() {
   // 取消编辑，恢复原始内容
   document.getElementById('yamlEditor').value = originalYamlContent;
@@ -745,19 +758,9 @@ function saveChanges() {
     });
 }
 
-// 点击弹窗外部区域关闭弹窗
-window.onclick = function (event) {
-  const modal = document.getElementById('userModal');
-  if (event.target === modal) {
-    closeModal();
-  }
-}
-
 // 键盘快捷键支持
 document.addEventListener('keydown', function (event) {
-  if (event.key === 'Escape') {
-    closeModal();
-  }
+  // 可以在这里添加其他快捷键支持
 });
 
 // Toast提示函数

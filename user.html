@@ -18,63 +18,54 @@
   <!-- 用户管理按钮 -->
   <div class="button-container">
     <div class="button-row">
-      <button class="config-button" onclick="loadUserConfig()">加载用户配置</button>
       <button class="back-button" onclick="window.location.href='gaga.html'">返回主页</button>
     </div>
   </div>
 
-  <!-- 用户配置弹窗 -->
-  <div id="userModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle">用户配置</h2>
-        <span class="close" onclick="closeModal()">&times;</span>
+  <!-- 用户配置内容区域 -->
+  <div class="user-content-container">
+    <div class="edit-mode-toggle">
+      <div>
+        <span id="modeIndicator">查看模式</span>
       </div>
-      <div class="modal-body">
-        <div class="edit-mode-toggle">
-          <div>
-            <span id="modeIndicator">查看模式</span>
-          </div>
-          <div class="mode-switch">
-            <button id="toggleFormBtn" class="toggle-view-btn" onclick="setViewMode('form')">表单</button>
-            <button id="toggleYamlBtn" class="toggle-view-btn" onclick="setViewMode('yaml')">YAML</button>
-            <button id="toggleEditBtn" class="toggle-edit-btn" onclick="toggleEditMode()">编辑</button>
-          </div>
-        </div>
-
-        <!-- YAML查看容器 -->
-        <div id="yamlViewContainer">
-          <pre id="yamlContent" class="yaml-content"></pre>
-        </div>
-
-        <!-- YAML编辑容器 -->
-        <div id="yamlEditContainer" style="display: none;">
-          <label for="yamlEditor"></label><textarea id="yamlEditor" class="yaml-editor"
-            placeholder="在此编辑YAML配置..."></textarea>
-          <div class="modal-buttons">
-            <button class="cancel-btn" onclick="cancelEdit()">取消</button>
-            <button class="save-btn" onclick="saveChanges()">保存</button>
-          </div>
-        </div>
-
-        <!-- 表单查看容器 -->
-        <div id="formViewContainer" style="display: none;">
-          <div id="formContent" class="form-container">
-            <!-- 表单内容将动态生成 -->
-          </div>
-        </div>
-
-        <!-- 表单编辑容器 -->
-        <div id="formEditContainer" style="display: none;">
-          <form id="configForm" class="form-container">
-            <!-- 表单编辑内容将动态生成 -->
-          </form>
-          <div class="modal-buttons">
-            <button class="cancel-btn" onclick="cancelEdit()">取消</button>
-            <button class="save-btn" onclick="saveFormChanges()">保存</button>
-          </div>
-        </div>
+      <div class="mode-switch">
+        <button id="toggleFormBtn" class="toggle-view-btn" onclick="setViewMode('form')">表单</button>
+        <button id="toggleYamlBtn" class="toggle-view-btn" onclick="setViewMode('yaml')">YAML</button>
+        <button id="toggleEditBtn" class="toggle-edit-btn" onclick="toggleEditMode()">编辑</button>
       </div>
+    </div>
+
+    <!-- YAML查看容器 -->
+    <div id="yamlViewContainer">
+      <pre id="yamlContent" class="yaml-content"></pre>
+    </div>
+
+    <!-- YAML编辑容器 -->
+    <div id="yamlEditContainer" style="display: none;">
+      <label for="yamlEditor"></label><textarea id="yamlEditor" class="yaml-editor"
+        placeholder="在此编辑YAML配置..."></textarea>
+    </div>
+
+    <!-- 表单查看容器 -->
+    <div id="formViewContainer" style="display: none;">
+      <div id="formContent" class="form-container">
+        <!-- 表单内容将动态生成 -->
+      </div>
+    </div>
+
+    <!-- 表单编辑容器 -->
+    <div id="formEditContainer" style="display: none;">
+      <form id="configForm" class="form-container">
+        <!-- 表单编辑内容将动态生成 -->
+      </form>
+    </div>
+  </div>
+
+  <!-- 固定底部按钮 -->
+  <div class="fixed-bottom-buttons" id="fixedBottomButtons" style="display: none;">
+    <div class="modal-buttons user-page">
+      <button class="cancel-btn" onclick="cancelEdit()">取消</button>
+      <button class="save-btn" onclick="handleSave()">保存</button>
     </div>
   </div>
 
