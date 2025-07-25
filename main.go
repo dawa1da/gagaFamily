@@ -16,15 +16,22 @@ func init() {
 
 func main() {
     // http.HandleFunc("/gagaFamily/game", htmlHandler)
-	http.Handle("/src/", http.StripPrefix("/src/", http.FileServer(http.Dir("src"))))
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// 只允许访问 .html 文件
-		if strings.HasSuffix(r.URL.Path, ".html") {
-			http.ServeFile(w, r, "."+r.URL.Path)
-			return
-		}
-		http.NotFound(w, r)
-	})
+	http.Handle("/gagaFamily/game/src/", http.StripPrefix("/gagaFamily/game/src/", http.FileServer(http.Dir("src"))))
+	http.HandleFunc("/gagaFamily/game/", func(w http.ResponseWriter, r *http.Request) {
+        // 只允许 .html 文件
+        if strings.HasSuffix(r.URL.Path, ".html") {
+            // 去掉前缀，得到文件名
+            filename := strings.TrimPrefix(r.URL.Path, "/gagaFamily/game/")
+            // 防止目录穿越攻击
+            if strings.Contains(filename, "/") || strings.Contains(filename, "\\") {
+                http.NotFound(w, r)
+                return
+            }
+            http.ServeFile(w, r, filename)
+            return
+        }
+        http.NotFound(w, r)
+    })
 	//配置文件
 	http.HandleFunc("/gagaFamily/conf/heroYaml", gameplay.HeroYamlHandler)
 	http.HandleFunc("/gagaFamily/conf/heroEdit", gameplay.HeroEditHandler)
