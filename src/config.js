@@ -1,5 +1,7 @@
 // 全局配置变量
+// const API_BASE_URL = 'http://106.53.193.122:8008';
 const API_BASE_URL = 'http://127.0.0.1:8008';
+
 
 const rewardTitles = [
   '胜方MVP',

@@ -26,6 +26,10 @@
         ← 返回主页
       </a>
 
+      <a href="reward-config.html" class="back-button" >
+        ⚙️ 奖励配置
+      </a>
+
       <div class="reward-history">
         <h3>🎯 奖励历史</h3>
         <div id="rewardHistory">
@@ -190,16 +194,30 @@
     }
 
     // Toast提示函数
-    function showToast(msg) {
+    function showToast(msg, type = 'success') {
       let toast = document.querySelector('.toast');
       if (!toast) {
         toast = document.createElement('div');
         toast.className = 'toast';
         document.body.appendChild(toast);
       }
+      
       toast.textContent = msg;
+      toast.className = `toast ${type}`;
+      
+      // 强制重绘以确保动画效果
+      toast.offsetHeight;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+        // 动画结束后清理
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 300);
+      }, 2000);
     }
 
     // 点击弹窗外部区域关闭弹窗
