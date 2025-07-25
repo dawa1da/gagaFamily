@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>奖励结算 - GAGA GAME</title>
+  <link rel="stylesheet" href="src/style.css">
+  <link rel="stylesheet" href="src/reward.css">
+</head>
+
+<body>
+  <div class="reward-page">
+    <div class="reward-header">
+      <div class="logo-circle">🎁</div>
+      <h1>奖励结算</h1>
+      <p>随机抽取游戏奖励，让游戏更有趣！</p>
+    </div>
+
+    <div class="reward-container">
+      <button class="reward-button" onclick="showRewardResult()">
+        🎲 开始奖励结算
+      </button>
+
+      <a href="gaga.html" class="back-button">
+        ← 返回主页
+      </a>
+
+      <div class="reward-history">
+        <h3>🎯 奖励历史</h3>
+        <div id="rewardHistory">
+          <div class="history-item">
+            <div class="title">点击上方按钮开始结算</div>
+            <div class="desc">每次结算都会随机生成不同的奖励</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast"></div>
+
+  <script src="src/config.js"></script>
+  <script>
+    // 奖励历史记录
+    let rewardHistory = [];
+
+    // 奖励结算函数
+    function showRewardResult() {
+      // 随机抽取title和desc
+      const randomTitle = rewardTitles[Math.floor(Math.random() * rewardTitles.length)];
+      const randomDesc = rewardDescs[Math.floor(Math.random() * rewardDescs.length)];
+      const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      const randomBg = bgGradients[Math.floor(Math.random() * bgGradients.length)];
+      
+      // 创建奖励结算弹窗
+      const rewardModal = document.createElement('div');
+      rewardModal.className = 'modal';
+      rewardModal.style.display = 'block';
+      rewardModal.style.zIndex = '9999';
+      rewardModal.innerHTML = `
+        <div class="modal-content" style="
+          max-width: 450px;
+          background: ${randomBg};
+          border: 3px solid ${randomColor};
+          border-radius: 20px;
+          box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+          animation: rewardModalSlideIn 0.5s ease-out;
+        ">
+          <div class="modal-header" style="
+            background: transparent;
+            border-bottom: 2px solid ${randomColor};
+            padding: 20px 30px 15px;
+          ">
+            <h2 style="
+              color: ${randomColor};
+              font-size: 1.8rem;
+              font-weight: 700;
+              margin: 0;
+              text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            ">🎁 奖励结算</h2>
+            <span class="close" onclick="closeRewardModal()" style="
+              color: ${randomColor};
+              font-size: 2rem;
+              font-weight: bold;
+            ">&times;</span>
+          </div>
+          <div class="modal-body" style="padding: 30px; text-align: center;">
+            <div class="reward-icon" style="
+              font-size: 5rem;
+              margin-bottom: 20px;
+              animation: rewardIconBounce 0.8s ease-in-out;
+            ">${randomIcon}</div>
+            <h3 style="
+              color: ${randomColor};
+              font-size: 1.6rem;
+              margin: 15px 0;
+              font-weight: 700;
+              text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            ">${randomTitle}</h3>
+            <div class="reward-amount" style="
+              background: rgba(255,255,255,0.9);
+              padding: 15px 25px;
+              border-radius: 20px;
+              margin: 20px 0;
+              display: inline-block;
+              box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            ">
+              <span style="
+                color: #dc3545;
+                font-size: 1.4rem;
+                font-weight: 700;
+              ">💰 ${randomDesc}</span>
+            </div>
+            <div class="reward-congrats" style="
+              margin-top: 25px;
+              padding: 15px;
+              background: rgba(255,255,255,0.4);
+              border-radius: 15px;
+              font-size: 1.1rem;
+              color: #495057;
+              font-weight: 600;
+            ">🎉 恭喜获得奖励！</div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(rewardModal);
+      document.body.style.overflow = 'hidden';
+      
+      // 添加到历史记录
+      addToHistory(randomTitle, randomDesc, randomIcon);
+    }
+
+    function closeRewardModal() {
+      const rewardModal = document.querySelector('.modal[style*="z-index: 9999"]');
+      if (rewardModal) {
+        rewardModal.remove();
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    function addToHistory(title, desc, icon) {
+      const timestamp = new Date().toLocaleString('zh-CN');
+      const historyItem = {
+        title: title,
+        desc: desc,
+        icon: icon,
+        timestamp: timestamp
+      };
+      
+      rewardHistory.unshift(historyItem);
+      
+      // 只保留最近10条记录
+      if (rewardHistory.length > 10) {
+        rewardHistory = rewardHistory.slice(0, 10);
+      }
+      
+      updateHistoryDisplay();
+    }
+
+    function updateHistoryDisplay() {
+      const historyContainer = document.getElementById('rewardHistory');
+      
+      if (rewardHistory.length === 0) {
+        historyContainer.innerHTML = `
+          <div class="history-item">
+            <div class="title">暂无奖励记录</div>
+            <div class="desc">点击上方按钮开始结算</div>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = '';
+      rewardHistory.forEach((item, index) => {
+        html += `
+          <div class="history-item">
+            <div class="title">${item.icon} ${item.title}</div>
+            <div class="desc">${item.desc}</div>
+            <div class="desc" style="font-size: 0.8rem; color: #adb5bd; margin-top: 5px;">
+              ${item.timestamp}
+            </div>
+          </div>
+        `;
+      });
+      
+      historyContainer.innerHTML = html;
+    }
+
+    // Toast提示函数
+    function showToast(msg) {
+      let toast = document.querySelector('.toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // 点击弹窗外部区域关闭弹窗
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal') && event.target.style.zIndex === '9999') {
+        closeRewardModal();
+      }
+    }
+
+    // 键盘快捷键支持
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeRewardModal();
+      }
+    });
+
+    // 页面加载时初始化历史记录显示
+    document.addEventListener('DOMContentLoaded', function() {
+      updateHistoryDisplay();
+    });
+  </script>
+</body>
+
+</html> 

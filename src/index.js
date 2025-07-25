@@ -1206,10 +1206,7 @@ window.onclick = function (event) {
   if (event.target === groupResultModal) {
     closeGroupResultModal();
   }
-  // 关闭奖励结算弹窗
-  if (event.target.classList.contains('modal') && event.target.style.zIndex === '9999') {
-    closeRewardModal();
-  }
+
 }
 
 // 键盘快捷键支持
@@ -1217,7 +1214,6 @@ document.addEventListener('keydown', function (event) {
   if (event.key === 'Escape') {
     closeModal();
     closeGroupResultModal();
-    closeRewardModal();
   }
 });
 
@@ -1235,115 +1231,7 @@ function showToast(msg) {
 }
 // 在保存、删除等操作成功/失败时调用 showToast('操作成功')
 
-// 奖励结算函数
-function showRewardResult() {
-  // 随机抽取title和desc
-  const randomTitle = rewardTitles[Math.floor(Math.random() * rewardTitles.length)];
-  const randomDesc = rewardDescs[Math.floor(Math.random() * rewardDescs.length)];
-  const randomIcon = icons[Math.floor(Math.random() * icons.length)];
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
-  const randomBg = bgGradients[Math.floor(Math.random() * bgGradients.length)];
-  // 创建奖励结算弹窗
-  const rewardModal = document.createElement('div');
-  rewardModal.className = 'modal';
-  rewardModal.style.display = 'block';
-  rewardModal.style.zIndex = '9999';
-  rewardModal.innerHTML = `
-            <div class="modal-content" style="
-                max-width: 450px;
-                background: ${randomBg};
-                border: 3px solid ${randomColor};
-                border-radius: 20px;
-                box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-                animation: rewardModalSlideIn 0.5s ease-out;
-            ">
-                <div class="modal-header" style="
-                    background: transparent;
-                    border-bottom: 2px solid ${randomColor};
-                    padding: 20px 30px 15px;
-                ">
-                    <h2 style="
-                        color: ${randomColor};
-                        font-size: 1.8rem;
-                        font-weight: 700;
-                        margin: 0;
-                        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-                    ">🎁 奖励结算</h2>
-                    <span class="close" onclick="closeRewardModal()" style="
-                        color: ${randomColor};
-                        font-size: 2rem;
-                        font-weight: bold;
-                    ">&times;</span>
-                </div>
-                <div class="modal-body" style="padding: 30px; text-align: center;">
-                    <div class="reward-icon" style="
-                        font-size: 5rem;
-                        margin-bottom: 20px;
-                        animation: rewardIconBounce 0.8s ease-in-out;
-                    ">${randomIcon}</div>
-                    <h3 style="
-                        color: ${randomColor};
-                        font-size: 1.6rem;
-                        margin: 15px 0;
-                        font-weight: 700;
-                        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-                    ">${randomTitle}</h3>
-                    <div class="reward-amount" style="
-                        background: rgba(255,255,255,0.9);
-                        padding: 15px 25px;
-                        border-radius: 20px;
-                        margin: 20px 0;
-                        display: inline-block;
-                        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                    ">
-                        <span style="
-                            color: #dc3545;
-                            font-size: 1.4rem;
-                            font-weight: 700;
-                        ">💰 ${randomDesc}</span>
-                    </div>
-                    <div class="reward-congrats" style="
-                        margin-top: 25px;
-                        padding: 15px;
-                        background: rgba(255,255,255,0.4);
-                        border-radius: 15px;
-                        font-size: 1.1rem;
-                        color: #495057;
-                        font-weight: 600;
-                    ">🎉 恭喜获得奖励！</div>
-                </div>
-            </div>
-            <style>
-                @keyframes rewardModalSlideIn {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-50px) scale(0.9);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0) scale(1);
-                    }
-                }
-                @keyframes rewardIconBounce {
-                    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-                    40% { transform: translateY(-15px); }
-                    60% { transform: translateY(-7px); }
-                }
-            </style>
-        `;
-  document.body.appendChild(rewardModal);
-  document.body.style.overflow = 'hidden';
-  // 显示Toast提示
-  showToast('🎊 奖励结算完成！');
-}
 
-function closeRewardModal() {
-  const rewardModal = document.querySelector('.modal[style*="z-index: 9999"]');
-  if (rewardModal) {
-    rewardModal.remove();
-    document.body.style.overflow = 'auto';
-  }
-}
 
 // 分组结果弹窗
 function showGroupResultModal(text) {
