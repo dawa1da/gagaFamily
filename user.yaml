@@ -3,36 +3,41 @@ users:
     banList: [
       "兰陵王"
     ]
-    weightList: [
-      "瑶*99",
-      "戈娅*101",
-      "成吉思汗*99",
-      "成吉思汗*1"
-    ]
+    weightList: [ ]
+    disable: false
   - name: "季"
     banList: [ ]
     weightList: [ ]
+    disable: false
   - name: "来姐"
     banList: [ ]
     weightList: [ ]
+    disable: false
   - name: "真心"
     banList: [ ]
     weightList: [ ]
+    disable: false
   - name: "逍遥"
     banList: [ ]
     weightList: [ ]
+    disable: false
   - name: "lup"
     banList: [ ]
     weightList: [ ]
+    disable: false
   - name: "柯镇恶"
     banList: [ ]
     weightList: [ ]
+    disable: false
   - name: "小何"
     banList: [ ]
     weightList: [ ]
+    disable: false
   - name: "全姐"
     banList: [ ]
     weightList: [ ]
+    disable: false
   - name: "闪闪"
     banList: [ ]
     weightList: [ ]
+    disable: false
