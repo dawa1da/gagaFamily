@@ -56,6 +56,5 @@ func ResetUndercoverHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	InitUndercover()
-	_, _ = fmt.Fprintf(w, fmt.Sprintf("队伍号重置为%s", teamNumber))
-	log.Println(fmt.Sprintf("队伍号重置为%s", teamNumber))
+	_, _ = fmt.Fprintf(w, fmt.Sprintf("队伍号重置为%s,卧底数量", teamNumber))
 }

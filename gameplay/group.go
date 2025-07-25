@@ -42,18 +42,26 @@ func GetGroupHandler(w http.ResponseWriter, r *http.Request) {
 	positions := []string{"对抗路", "打野", "中路", "发育路", "游走"}
 	positions = append(positions, positions...)
 
+	enabled := make([]*UserInfo, 0)
+	for _, u := range group.Users {
+		if !u.Disable {
+			enabled = append(enabled, u)
+		}
+	}
+
+	if len(enabled) != 10 {
+		_, _ = fmt.Fprintf(w, fmt.Sprintf("启用的玩家数量不为10！！！\n"))
+		return
+	}
+
 	//打乱一下玩家顺序，然后顺序分配分路就好了，实现随机分路
-	rand.Shuffle(len(group.Users), func(i, j int) {
-		group.Users[i], group.Users[j] = group.Users[j], group.Users[i]
+	rand.Shuffle(len(enabled), func(i, j int) {
+		enabled[i], enabled[j] = enabled[j], enabled[i]
 	})
 
 	_, _ = fmt.Fprintf(w, fmt.Sprintf("----------------------------------\n"))
-	for i, user := range group.Users {
-		if user.Disable != false {
-			continue
-		}
-
-		group.Users[i].Position = positions[i]
+	for i, user := range enabled {
+		enabled[i].Position = positions[i]
 		userHeroPool := make([]string, len(hero.Positions[positions[i]]))
 		copy(userHeroPool, hero.Positions[positions[i]])
 

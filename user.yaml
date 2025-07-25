@@ -3,7 +3,10 @@ users:
     banList: [
       "兰陵王"
     ]
-    weightList: [ ]
+    weightList: [
+      "瑶*99",
+      "戈娅*101"
+    ]
     disable: false
   - name: "季"
     banList: [ ]
@@ -41,3 +44,11 @@ users:
     banList: [ ]
     weightList: [ ]
     disable: false
+  - name: "11"
+    banList: [ ]
+    weightList: [ ]
+    disable: true
+  - name: "12"
+    banList: [ ]
+    weightList: [ ]
+    disable: true

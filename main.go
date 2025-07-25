@@ -35,7 +35,7 @@ func main() {
 func htmlHandler(w http.ResponseWriter, r *http.Request) {
 
 	//周四彩蛋
-	if time.Now().Weekday() == time.Thursday && rand.Intn(2) == 0 {
+	if time.Now().Weekday() == time.Thursday && rand.Intn(5) == 0 {
 		http.Redirect(w, r, "https://m.kfc.com.cn/", http.StatusFound)
 		return
 	}
