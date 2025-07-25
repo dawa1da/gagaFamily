@@ -18,15 +18,51 @@ gagaFamily 是一个轻量级的 Web 游戏服务器，支持多人分组和卧�
 
 ## 主要功能
 
-<pre> ```mermaid graph TB gagagame["gagagame 核心系统"] 配置模块["配置模块"] 玩法模块["玩法模块"] 结算模块["结算模块"] 玩家配置["玩家配置"] 英雄配置["英雄配置"] 分组系统["分组系统"] 卧底系统["卧底系统"] 结算系统["结算系统"] gagagame --> 配置模块 gagagame --> 玩法模块 gagagame --> 结算模块 配置模块 --> 玩家配置 配置模块 --> 英雄配置 玩法模块 --> 分组系统 玩法模块 --> 卧底系统 结算模块 --> 结算系统 ``` </pre>
+```mermaid
+graph LR
+  %% 样式设定
+  classDef root fill:#FFD700,stroke:#333,stroke-width:2px,font-weight:bold
+  classDef module fill:#ADD8E6,stroke:#333,stroke-width:1px
+  classDef submodule fill:#E0FFFF,stroke:#888,stroke-width:1px
+
+  %% 主模块
+  gagaFamily[🎮 gagaFamily]:::root
+
+  %% 一级模块
+  配置模块[⚙️ 配置模块]:::module
+  玩法模块[🕹️ 玩法模块]:::module
+
+  %% 二级模块
+  玩家配置[👤 玩家配置]:::submodule
+  英雄配置[🧙‍♂️ 英雄配置]:::submodule
+  分组系统[👥 分组系统]:::submodule
+  卧底系统[🕵️‍♂️ 卧底系统]:::submodule
+
+  %% 连接关系
+  gagaFamily --> 配置模块
+  gagaFamily --> 玩法模块
+
+  配置模块 --> 玩家配置
+  配置模块 --> 英雄配置
+
+  玩法模块 --> 分组系统
+  玩法模块 --> 卧底系统
+```
+
+### 功能详述
+
+- **配置模块**: 管理游戏基础配置
+  - **玩家配置**: 管理玩家信息、禁用英雄列表、权重英雄列表
+  - **英雄配置**: 管理各位置英雄池配置
+
+- **玩法模块**: 核心游戏功能
+  - **分组系统**: 10人自动分组，随机分配游戏位置和英雄
+  - **卧底系统**: 多人卧底游戏，随机指定卧底角色
 
 ## 使用方式
 
 1. 启动后端 Go 服务（见下方安装与运行）
 2. 浏览器访问 `http://服务器IP:8008/gagaFamily/game`
-3. **配置管理**: 点击"HERO"或"USER"按钮，进入配置编辑弹窗
-4. **分组功能**: 点击"分组"按钮，分组结果以美观弹窗展示
-5. **奖励结算**: 点击"奖励结算"按钮，随机显示一种奖励类型
 
 
 ## 安装和运行
