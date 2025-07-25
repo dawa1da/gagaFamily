@@ -112,6 +112,33 @@ button:active {
   background: #e55a2b;
 }
 
+/* 返回按钮样式 */
+.back-button {
+  background: linear-gradient(90deg, #6c757d 0%, #495057 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(.4, 0, .2, 1);
+  min-width: 100px;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.15);
+  font-weight: 600;
+  outline: none;
+}
+
+.back-button:hover {
+  background: linear-gradient(90deg, #495057 0%, #6c757d 100%);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.25);
+}
+
+.back-button:active {
+  background: #343a40;
+  transform: scale(0.98);
+}
+
 /* 弹窗样式优化 */
 .modal {
   display: none;

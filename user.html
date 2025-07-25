@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GAGA GAME</title>
+  <title>用户管理 - GAGA GAME</title>
   <link rel="stylesheet" href="src/style.css">
 </head>
 
@@ -12,29 +12,22 @@
   <!-- 顶部LOGO与标题区 -->
   <div class="header">
     <div class="logo-circle">G</div>
-    <h1>GAGA GAME</h1>
+    <h1>用户管理</h1>
   </div>
+
+  <!-- 用户管理按钮 -->
   <div class="button-container">
-    <!-- 配置按钮行 -->
     <div class="button-row">
-      <button class="config-button" onclick="urlRequest('/gagaFamily/conf/heroYaml', true, 'hero')">HERO</button>
-      <button class="config-button" onclick="window.location.href='user.html'">USER</button>
-    </div>
-    <!-- 分组按钮行 -->
-    <div class="button-row">
-      <button class="group-button" onclick="urlRequest('/gagaFamily/group/getGroup')">分组</button>
-    </div>
-    <!-- 奖励结算按钮行 -->
-    <div class="button-row">
-      <button class="reward-button" onclick="window.location.href='reward.html'">奖励结算</button>
+      <button class="config-button" onclick="loadUserConfig()">加载用户配置</button>
+      <button class="back-button" onclick="window.location.href='gaga.html'">返回主页</button>
     </div>
   </div>
 
-  <!-- 优化后的弹窗HTML -->
-  <div id="yamlModal" class="modal">
+  <!-- 用户配置弹窗 -->
+  <div id="userModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="modalTitle">配置内容</h2>
+        <h2 id="modalTitle">用户配置</h2>
         <span class="close" onclick="closeModal()">&times;</span>
       </div>
       <div class="modal-body">
@@ -85,24 +78,11 @@
     </div>
   </div>
 
-  <!-- 分组结果弹窗 -->
-  <div id="groupResultModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>分组结果</h2>
-        <span class="close" onclick="closeGroupResultModal()">&times;</span>
-      </div>
-      <div class="modal-body" id="groupResultBody">
-        <!-- 分组结果内容将动态加载 -->
-      </div>
-    </div>
-  </div>
-
   <div class="toast"></div>
 
   <script src="src/config.js"></script>
-  <script src="src/index.js"></script>
+  <script src="src/user.js"></script>
 
 </body>
 
-</html>
+</html> 
