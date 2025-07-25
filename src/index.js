@@ -169,11 +169,13 @@ function generateHeroFormView(container) {
   // 按位置分类英雄
   const positionGroups = {};
   configData.heroes.forEach(hero => {
-    const position = hero.type || '未分类';
-    if (!positionGroups[position]) {
-      positionGroups[position] = [];
+    const position = hero.type;
+    if (position && position.trim()) {
+      if (!positionGroups[position]) {
+        positionGroups[position] = [];
+      }
+      positionGroups[position].push(hero.name);
     }
-    positionGroups[position].push(hero.name);
   });
 
   // 创建选项卡容器
@@ -238,11 +240,13 @@ function generateHeroFormEdit(container) {
   // 按位置分类英雄
   const positionGroups = {};
   configData.heroes.forEach(hero => {
-    const position = hero.type || '未分类';
-    if (!positionGroups[position]) {
-      positionGroups[position] = [];
+    const position = hero.type;
+    if (position && position.trim()) {
+      if (!positionGroups[position]) {
+        positionGroups[position] = [];
+      }
+      positionGroups[position].push(hero.name);
     }
-    positionGroups[position].push(hero.name);
   });
 
   // 创建选项卡容器
@@ -581,11 +585,13 @@ function generateYamlFromConfig(config) {
     config.heroes.forEach(hero => {
       if (!hero.name.trim()) return; // 跳过空名称的英雄
 
-      const position = hero.type || '未分类';
-      if (!positionGroups[position]) {
-        positionGroups[position] = [];
+      const position = hero.type;
+      if (position && position.trim()) {
+        if (!positionGroups[position]) {
+          positionGroups[position] = [];
+        }
+        positionGroups[position].push(hero.name);
       }
-      positionGroups[position].push(hero.name);
     });
 
     // 生成位置分组的YAML格式
